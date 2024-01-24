@@ -39,12 +39,12 @@ public class CurrencyExchangeDao {
                 baseCurrency.setId(resultSet.getLong("id"));
                 baseCurrency.setCode(resultSet.getString("code"));
                 baseCurrency.setSign(resultSet.getString("sign"));
-                baseCurrency.setCode(resultSet.getString("fullname"));
+                baseCurrency.setFullName(resultSet.getString("fullname"));
 
                 targetCurrency.setId(resultSet.getLong("target_id"));
                 targetCurrency.setCode(resultSet.getString("target_code"));
                 targetCurrency.setSign(resultSet.getString("target_sign"));
-                targetCurrency.setCode(resultSet.getString("target_fullname"));
+                targetCurrency.setFullName(resultSet.getString("target_fullname"));
 
 
                 exchangeRateList.add(exchangeRate);
@@ -56,5 +56,31 @@ public class CurrencyExchangeDao {
         }
         return exchangeRateList;
 
+    }
+
+    public ExchangeRate getExchangeRateByCode(String path) {
+        String baseCurrencyCode = path.substring(0, 3);
+        String targetCurrencyCode = path.substring(3, 6);
+        CurrencyDao currencyDao = new CurrencyDao();
+        Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
+        Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
+
+        ExchangeRate exchangeRate = new ExchangeRate();
+        try {
+            PreparedStatement statement = connection.prepareStatement("SELECT * FROM exchangerates WHERE basecurrencyid = ? AND targetcurrencyid = ?");
+            statement.setLong(1, baseCurrency.getId());
+            statement.setLong(2, targetCurrency.getId());
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                exchangeRate.setId(resultSet.getLong("id"));
+                exchangeRate.setBaseCurrency(baseCurrency);
+                exchangeRate.setTargetCurrency(targetCurrency);
+                exchangeRate.setRate(resultSet.getFloat("rate"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return exchangeRate;
     }
 }
