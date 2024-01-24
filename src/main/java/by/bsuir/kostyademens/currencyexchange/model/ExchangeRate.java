@@ -1,13 +1,22 @@
 package by.bsuir.kostyademens.currencyexchange.model;
 
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+@JsonPropertyOrder({"id", "baseCurrency", "targetCurrency", "rate"})
 public class ExchangeRate {
 
     private long id;
-    private long baseCurrencyId;
-    private long targetCurrencyId;
+    private Currency baseCurrency;
+    private Currency targetCurrency;
     private float rate;
+
+    public ExchangeRate(long id, Currency baseCurrency, Currency targetCurrency, float rate) {
+        this.id = id;
+        this.baseCurrency = baseCurrency;
+        this.targetCurrency = targetCurrency;
+        this.rate = rate;
+    }
 
     public long getId() {
         return id;
@@ -17,20 +26,20 @@ public class ExchangeRate {
         this.id = id;
     }
 
-    public long getBaseCurrencyId() {
-        return baseCurrencyId;
+    public Currency getBaseCurrency() {
+        return baseCurrency;
     }
 
-    public void setBaseCurrencyId(long baseCurrencyId) {
-        this.baseCurrencyId = baseCurrencyId;
+    public void setBaseCurrency(Currency baseCurrency) {
+        this.baseCurrency = baseCurrency;
     }
 
-    public long getTargetCurrencyId() {
-        return targetCurrencyId;
+    public Currency getTargetCurrency() {
+        return targetCurrency;
     }
 
-    public void setTargetCurrencyId(long targetCurrencyId) {
-        this.targetCurrencyId = targetCurrencyId;
+    public void setTargetCurrency(Currency targetCurrency) {
+        this.targetCurrency = targetCurrency;
     }
 
     public float getRate() {
@@ -38,13 +47,6 @@ public class ExchangeRate {
     }
 
     public void setRate(float rate) {
-        this.rate = rate;
-    }
-
-    public ExchangeRate(long id, long baseCurrencyId, long targetCurrencyId, float rate) {
-        this.id = id;
-        this.baseCurrencyId = baseCurrencyId;
-        this.targetCurrencyId = targetCurrencyId;
         this.rate = rate;
     }
 

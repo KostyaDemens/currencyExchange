@@ -1,8 +1,10 @@
 package by.bsuir.kostyademens.currencyexchange.dao;
 
+import by.bsuir.kostyademens.currencyexchange.model.Currency;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
 
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,16 +19,38 @@ public class CurrencyExchangeDao {
         List<ExchangeRate> exchangeRateList = new ArrayList<>();
         try {
             Statement statement = connection.createStatement();
-            String SQL = "SELECT * FROM exchangerates";
+            String SQL = "SELECT exch.id, cur.id , cur.code, cur.fullname, cur.sign, cur2.id AS target_id, cur2.code AS target_code, cur2.fullname AS target_fullname, cur2.sign AS target_sign, exch.rate\n" +
+                    "FROM exchangerates exch\n" +
+                    "INNER JOIN currencies cur ON exch.basecurrencyid = cur.id\n" +
+                    "INNER JOIN currencies cur2 ON exch.targetcurrencyid = cur2.id;";
             ResultSet resultSet = statement.executeQuery(SQL);
             while (resultSet.next()) {
                 ExchangeRate exchangeRate = new ExchangeRate();
+                Currency baseCurrency = new Currency();
+                Currency targetCurrency = new Currency();
+
                 exchangeRate.setId(resultSet.getLong("id"));
-                exchangeRate.setBaseCurrencyId(resultSet.getLong("baseCurrencyId"));
-                exchangeRate.setTargetCurrencyId(resultSet.getLong("targetCurrencyId"));
+
                 exchangeRate.setRate(resultSet.getFloat("rate"));
+
+                exchangeRate.setBaseCurrency(baseCurrency);
+                exchangeRate.setTargetCurrency(targetCurrency);
+
+                baseCurrency.setId(resultSet.getLong("id"));
+                baseCurrency.setCode(resultSet.getString("code"));
+                baseCurrency.setSign(resultSet.getString("sign"));
+                baseCurrency.setCode(resultSet.getString("fullname"));
+
+                targetCurrency.setId(resultSet.getLong("target_id"));
+                targetCurrency.setCode(resultSet.getString("target_code"));
+                targetCurrency.setSign(resultSet.getString("target_sign"));
+                targetCurrency.setCode(resultSet.getString("target_fullname"));
+
+
                 exchangeRateList.add(exchangeRate);
             }
+
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
