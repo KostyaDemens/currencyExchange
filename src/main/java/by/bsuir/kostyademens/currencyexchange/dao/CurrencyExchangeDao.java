@@ -83,4 +83,40 @@ public class CurrencyExchangeDao {
         }
         return exchangeRate;
     }
+
+    public ExchangeRate addExchangeRate(String baseCurrencyCode, String targetCurrencyCode, float rate) {
+        ExchangeRate exchangeRate = new ExchangeRate();
+        CurrencyDao currencyDao = new CurrencyDao();
+        Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
+        Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
+
+        String SQL = "INSERT INTO exchangerates (basecurrencyid, targetcurrencyid, rate) VALUES (?,?,?)";
+        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS)) {
+            preparedStatement.setLong(1, baseCurrency.getId());
+            preparedStatement.setLong(2, targetCurrency.getId());
+            preparedStatement.setFloat(3, rate);
+
+            int affectedRows = preparedStatement.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new SQLException();
+            }
+
+            try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
+                if (resultSet.next()) {
+                    long id = resultSet.getLong(1);
+                    exchangeRate.setId(id);
+                    exchangeRate.setBaseCurrency(baseCurrency);
+                    exchangeRate.setTargetCurrency(targetCurrency);
+                    exchangeRate.setRate(rate);
+                }
+            }
+
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return exchangeRate;
+    }
 }

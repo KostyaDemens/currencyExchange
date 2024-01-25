@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -24,5 +25,20 @@ public class ExchangeRatesServlet extends HttpServlet {
         resp.setContentType("application/json");
         PrintWriter out = resp.getWriter();
         out.println(jsonArray);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String baseCurrencyCode = req.getParameter("baseCurrencyCode");
+        String targetCurrencyCode = req.getParameter("targetCurrencyCode");
+        float rate = Float.parseFloat(req.getParameter("rate"));
+
+        CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
+        ExchangeRate exchangeRate = currencyExchangeDao.addExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
+
+        JSONObject jsonObject = new JSONObject(exchangeRate);
+        resp.setContentType("application/json");
+        PrintWriter out = resp.getWriter();
+        out.println(jsonObject);
     }
 }
