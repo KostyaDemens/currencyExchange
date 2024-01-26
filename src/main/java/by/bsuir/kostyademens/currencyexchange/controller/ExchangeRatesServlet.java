@@ -29,16 +29,21 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String baseCurrencyCode = req.getParameter("baseCurrencyCode");
-        String targetCurrencyCode = req.getParameter("targetCurrencyCode");
-        float rate = Float.parseFloat(req.getParameter("rate"));
+            String baseCurrencyCode = req.getParameter("baseCurrencyCode");
+            String targetCurrencyCode = req.getParameter("targetCurrencyCode");
+            String rate = req.getParameter("rate");
 
-        CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
-        ExchangeRate exchangeRate = currencyExchangeDao.addExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
+            if (baseCurrencyCode == null || targetCurrencyCode == null || rate == null) {
+                resp.sendError(400);
+                return;
+            }
 
-        JSONObject jsonObject = new JSONObject(exchangeRate);
-        resp.setContentType("application/json");
-        PrintWriter out = resp.getWriter();
-        out.println(jsonObject);
-    }
+            CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
+            ExchangeRate exchangeRate = currencyExchangeDao.addExchangeRate(baseCurrencyCode, targetCurrencyCode, Float.parseFloat(rate));
+
+            JSONObject jsonObject = new JSONObject(exchangeRate);
+            resp.setContentType("application/json");
+            PrintWriter out = resp.getWriter();
+            out.println(jsonObject);
+        }
 }

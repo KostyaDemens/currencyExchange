@@ -5,17 +5,17 @@ import by.bsuir.kostyademens.currencyexchange.model.Currency;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
 import static by.bsuir.kostyademens.currencyexchange.dao.JDBCConnector.connection;
 
 
 public class CurrencyDao {
 
     public List<Currency> getAllCurrencies() {
+        String SQL = "SELECT * FROM currencies";
         List<Currency> currencies = new ArrayList<>();
-        try {
-            Statement statement = connection.createStatement();
-            String SQL = "SELECT * FROM currencies";
-            ResultSet resultSet = statement.executeQuery(SQL);
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(SQL)) {
 
             while (resultSet.next()) {
                 Currency currency = new Currency();
@@ -36,10 +36,10 @@ public class CurrencyDao {
 
     public Currency getCurrencyByCode(String code) {
         Currency currency = new Currency();
-        try {
-            PreparedStatement statement = connection.prepareStatement("SELECT * FROM currencies WHERE code = ?");
+        String SQL = "SELECT * FROM currencies WHERE code = ?";
+        try (PreparedStatement statement = connection.prepareStatement(SQL);
+             ResultSet resultSet = statement.executeQuery()) {
             statement.setString(1, code);
-            ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 currency.setId(resultSet.getLong("id"));
                 currency.setCode(resultSet.getString("code"));
@@ -54,10 +54,8 @@ public class CurrencyDao {
 
     public Currency addCurrency(String code, String fullName, String sign) {
         Currency currency = new Currency();
-        PreparedStatement statement;
-        try {
-            String sql = "INSERT INTO currencies (code, fullName, sign) VALUES (?,?,?)";
-            statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        String SQL = "INSERT INTO currencies (code, fullName, sign) VALUES (?,?,?)";
+        try (PreparedStatement statement = connection.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS)){
 
             statement.setString(1, code);
             statement.setString(2, fullName);
