@@ -140,4 +140,22 @@ public class CurrencyExchangeDao {
             throw new RuntimeException();
         }
     }
+
+
+    public ExchangeRate changeExchangeRate(String path, float rate) {
+        ExchangeRate exchangeRate = getExchangeRateByCode(path);
+        String SQL = "UPDATE exchangeRates SET rate = ? WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(SQL)) {
+            statement.setFloat(1, rate);
+            statement.setLong(2, exchangeRate.getId());
+            int resultSet = statement.executeUpdate();
+
+            if (resultSet > 0) {
+                exchangeRate.setRate(rate);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException();
+        }
+        return exchangeRate;
+    }
 }

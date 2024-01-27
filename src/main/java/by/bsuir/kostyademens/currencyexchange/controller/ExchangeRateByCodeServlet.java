@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
+import javax.ws.rs.PATCH;
+import javax.ws.rs.Path;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -32,4 +34,22 @@ public class ExchangeRateByCodeServlet extends HttpServlet {
 
         }
     }
+
+
+    @PATCH
+
+    public void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String path = req.getPathInfo().substring(1);
+        String rate = req.getParameter("rate");
+
+        CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
+        ExchangeRate exchangeRate = currencyExchangeDao.changeExchangeRate(path, Float.parseFloat(rate));
+        JSONObject jsonObject = new JSONObject(exchangeRate);
+        resp.setContentType("application/json");
+        PrintWriter printWriter = resp.getWriter();
+        printWriter.println(jsonObject);
+    }
+
+
+
 }
