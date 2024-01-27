@@ -1,5 +1,7 @@
 package by.bsuir.kostyademens.currencyexchange.dao;
 
+import by.bsuir.kostyademens.currencyexchange.exceptions.CurrencyNotFoundException;
+import by.bsuir.kostyademens.currencyexchange.exceptions.DuplicateCurrencyExchangeException;
 import by.bsuir.kostyademens.currencyexchange.model.Currency;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
 import java.sql.PreparedStatement;
@@ -49,7 +51,7 @@ public class CurrencyExchangeDao {
 
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
         return exchangeRateList;
 
@@ -76,21 +78,24 @@ public class CurrencyExchangeDao {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
         return exchangeRate;
     }
 
 
-    public ExchangeRate addExchangeRate(String baseCurrencyCode, String targetCurrencyCode, float rate) {
+    public ExchangeRate addExchangeRate(String baseCurrencyCode, String targetCurrencyCode, float rate) throws DuplicateCurrencyExchangeException, CurrencyNotFoundException {
         ExchangeRate exchangeRate = new ExchangeRate();
         CurrencyDao currencyDao = new CurrencyDao();
         Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
         Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
 
-        if (isExchangeRatesExists(baseCurrency.getId(), targetCurrency.getId())) {
-
+        if (!currencyDao.isCodeExists(baseCurrencyCode) || !currencyDao.isCodeExists(targetCurrencyCode)) {
+            throw new CurrencyNotFoundException("Currency is not exists");
+        } else if (isExchangeRatesExists(baseCurrency.getId(), targetCurrency.getId())) {
+            throw new DuplicateCurrencyExchangeException("Pair of currencies already exists");
         }
+
 
         String SQL = "INSERT INTO exchangerates (basecurrencyid, targetcurrencyid, rate) VALUES (?,?,?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS)) {
@@ -116,7 +121,7 @@ public class CurrencyExchangeDao {
 
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
         return exchangeRate;
     }
@@ -132,8 +137,7 @@ public class CurrencyExchangeDao {
             return count > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
-        return false;
     }
 }

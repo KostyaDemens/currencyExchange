@@ -16,7 +16,6 @@ public class CurrencyDao {
         List<Currency> currencies = new ArrayList<>();
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(SQL)) {
-
             while (resultSet.next()) {
                 Currency currency = new Currency();
 
@@ -27,19 +26,18 @@ public class CurrencyDao {
 
                 currencies.add(currency);
             }
-
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException();
         }
         return currencies;
     }
 
-    public Currency getCurrencyByCode(String code) {
+    public Currency getCurrencyByCode(String code) throws RuntimeException {
         Currency currency = new Currency();
         String SQL = "SELECT * FROM currencies WHERE code = ?";
-        try (PreparedStatement statement = connection.prepareStatement(SQL);
-             ResultSet resultSet = statement.executeQuery()) {
+        try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setString(1, code);
+            ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 currency.setId(resultSet.getLong("id"));
                 currency.setCode(resultSet.getString("code"));
@@ -47,7 +45,7 @@ public class CurrencyDao {
                 currency.setFullName(resultSet.getString("fullName"));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
         return currency;
     }
@@ -55,7 +53,7 @@ public class CurrencyDao {
     public Currency addCurrency(String code, String fullName, String sign) {
         Currency currency = new Currency();
         String SQL = "INSERT INTO currencies (code, fullName, sign) VALUES (?,?,?)";
-        try (PreparedStatement statement = connection.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS)){
+        try (PreparedStatement statement = connection.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, code);
             statement.setString(2, fullName);
@@ -80,7 +78,7 @@ public class CurrencyDao {
 
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
         return currency;
     }
@@ -93,7 +91,7 @@ public class CurrencyDao {
                 return resultSet.getInt(1) > 0;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException();
         }
         return false;
     }

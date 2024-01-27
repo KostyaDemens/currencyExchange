@@ -1,6 +1,8 @@
 package by.bsuir.kostyademens.currencyexchange.controller;
 
 import by.bsuir.kostyademens.currencyexchange.dao.CurrencyExchangeDao;
+import by.bsuir.kostyademens.currencyexchange.exceptions.CurrencyNotFoundException;
+import by.bsuir.kostyademens.currencyexchange.exceptions.DuplicateCurrencyExchangeException;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -29,21 +31,29 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            String baseCurrencyCode = req.getParameter("baseCurrencyCode");
-            String targetCurrencyCode = req.getParameter("targetCurrencyCode");
-            String rate = req.getParameter("rate");
+        String baseCurrencyCode = req.getParameter("baseCurrencyCode");
+        String targetCurrencyCode = req.getParameter("targetCurrencyCode");
+        String rate = req.getParameter("rate");
 
-            if (baseCurrencyCode == null || targetCurrencyCode == null || rate == null) {
-                resp.sendError(400);
-                return;
-            }
+        if (baseCurrencyCode == null || targetCurrencyCode == null || rate == null) {
+            resp.sendError(400);
+            return;
+        }
 
-            CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
+        CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
+        try {
             ExchangeRate exchangeRate = currencyExchangeDao.addExchangeRate(baseCurrencyCode, targetCurrencyCode, Float.parseFloat(rate));
-
             JSONObject jsonObject = new JSONObject(exchangeRate);
             resp.setContentType("application/json");
             PrintWriter out = resp.getWriter();
             out.println(jsonObject);
+        } catch (DuplicateCurrencyExchangeException e) {
+            resp.sendError(409);
+            System.out.println(e.getMessage());
+        } catch (CurrencyNotFoundException e) {
+            resp.sendError(404);
+            System.out.println(e.getMessage());
         }
+
+    }
 }
