@@ -1,6 +1,6 @@
 package by.bsuir.kostyademens.currencyexchange.controller;
 
-import by.bsuir.kostyademens.currencyexchange.dao.CurrencyExchangeDao;
+import by.bsuir.kostyademens.currencyexchange.dao.ExchangeRateDao;
 import by.bsuir.kostyademens.currencyexchange.exceptions.CurrencyNotFoundException;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
 import jakarta.servlet.ServletException;
@@ -10,11 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
-import javax.json.Json;
-import javax.json.JsonPatch;
-import javax.json.JsonPatchBuilder;
-import javax.ws.rs.PATCH;
-import javax.ws.rs.Path;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -24,10 +19,10 @@ public class ExchangeRateByCodeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getPathInfo().substring(1);
-        CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
+        ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
 
         try {
-            ExchangeRate exchangeRate = currencyExchangeDao.getExchangeRateByCode(path);
+            ExchangeRate exchangeRate = exchangeRateDao.getExchangeRateByCode(path);
             JSONObject jsonObject = new JSONObject(exchangeRate);
             resp.setContentType("application/json");
             if (path.isEmpty()) {
@@ -47,12 +42,12 @@ public class ExchangeRateByCodeServlet extends HttpServlet {
         String path = req.getPathInfo().substring(1);
         String rate = req.getParameter("rate");
 
-        CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
+        ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
 
 
         try {
-            if (path.contains("rate")) {
-                ExchangeRate exchangeRate = currencyExchangeDao.changeExchangeRate(path, Float.parseFloat(rate));
+            if (rate != null) {
+                ExchangeRate exchangeRate = exchangeRateDao.changeExchangeRate(path, Float.parseFloat(rate));
                 JSONObject jsonObject = new JSONObject(exchangeRate);
                 resp.setContentType("application/json");
                 PrintWriter printWriter = resp.getWriter();

@@ -1,6 +1,6 @@
 package by.bsuir.kostyademens.currencyexchange.controller;
 
-import by.bsuir.kostyademens.currencyexchange.dao.CurrencyExchangeDao;
+import by.bsuir.kostyademens.currencyexchange.dao.ExchangeRateDao;
 import by.bsuir.kostyademens.currencyexchange.exceptions.CurrencyNotFoundException;
 import by.bsuir.kostyademens.currencyexchange.exceptions.DuplicateCurrencyExchangeException;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
@@ -21,8 +21,8 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
-        List<ExchangeRate> exchangeRates = currencyExchangeDao.getListOfExchangeRates();
+        ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
+        List<ExchangeRate> exchangeRates = exchangeRateDao.getListOfExchangeRates();
         JSONArray jsonArray = new JSONArray(exchangeRates);
         resp.setContentType("application/json");
         PrintWriter out = resp.getWriter();
@@ -40,9 +40,9 @@ public class ExchangeRatesServlet extends HttpServlet {
             return;
         }
 
-        CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
+        ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
         try {
-            ExchangeRate exchangeRate = currencyExchangeDao.addExchangeRate(baseCurrencyCode, targetCurrencyCode, Float.parseFloat(rate));
+            ExchangeRate exchangeRate = exchangeRateDao.addExchangeRate(baseCurrencyCode, targetCurrencyCode, Float.parseFloat(rate));
             JSONObject jsonObject = new JSONObject(exchangeRate);
             resp.setContentType("application/json");
             PrintWriter out = resp.getWriter();
