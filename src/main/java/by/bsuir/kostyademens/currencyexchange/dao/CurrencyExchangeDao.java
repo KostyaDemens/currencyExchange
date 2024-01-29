@@ -57,12 +57,15 @@ public class CurrencyExchangeDao {
 
     }
 
-    public ExchangeRate getExchangeRateByCode(String path) {
+    public ExchangeRate getExchangeRateByCode(String path) throws CurrencyNotFoundException{
         String baseCurrencyCode = path.substring(0, 3);
         String targetCurrencyCode = path.substring(3, 6);
         CurrencyDao currencyDao = new CurrencyDao();
         Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
         Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
+        if (baseCurrency.getId() == null || targetCurrency.getId() == null ) {
+            throw new CurrencyNotFoundException("Currency is not exists");
+        }
         String SQL = "SELECT * FROM exchangerates WHERE basecurrencyid = ? AND targetcurrencyid = ?";
         ExchangeRate exchangeRate = new ExchangeRate();
 
@@ -142,8 +145,9 @@ public class CurrencyExchangeDao {
     }
 
 
-    public ExchangeRate changeExchangeRate(String path, float rate) {
+    public ExchangeRate changeExchangeRate(String path, float rate) throws CurrencyNotFoundException{
         ExchangeRate exchangeRate = getExchangeRateByCode(path);
+
         String SQL = "UPDATE exchangeRates SET rate = ? WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setFloat(1, rate);
