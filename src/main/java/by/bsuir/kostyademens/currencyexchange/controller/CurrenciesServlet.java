@@ -38,7 +38,7 @@ public class CurrenciesServlet extends HttpServlet {
         Currency currency = currencyDao.addCurrency(code, fullName, sign);
         if (code == null || fullName == null || sign == null) {
             resp.sendError(400, "Отсутствует нужное поле формы");
-        } else if (currencyDao.isCodeExists(code)) {
+        } else if (!currencyDao.isCodeExists(code)) {
             resp.sendError(500);
         }
 

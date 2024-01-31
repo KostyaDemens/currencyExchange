@@ -66,10 +66,12 @@ public class ExchangeRateByCodeServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String method = req.getMethod();
-        if (!method.equals("PATCH")) {
+        if (method.equals("PATCH")) {
+            this.doPatch(req, resp);
+        } else {
             this.doGet(req, resp);
         }
-        this.doPatch(req, resp);
+
     }
 
 

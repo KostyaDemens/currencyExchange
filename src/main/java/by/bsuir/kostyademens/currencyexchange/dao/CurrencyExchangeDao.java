@@ -16,23 +16,32 @@ public class CurrencyExchangeDao {
         Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
         Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
 
-        final String pathToFindExchangeRate = baseCurrencyCode + targetCurrencyCode;
-
 
         if (currencyDao.isCodeExists(baseCurrencyCode) && currencyDao.isCodeExists(targetCurrencyCode)) {
-            try {
-                ExchangeRate exchangeRate = exchangeRateDao.getExchangeRateByCode(pathToFindExchangeRate);
-                if (exchangeRateDao.isExchangeRatesExists(exchangeRate.getBaseCurrency().getId(), exchangeRate.getTargetCurrency().getId())) {
-                    currencyExchange.setBaseCurrency(baseCurrency);
-                    currencyExchange.setTargetCurrency(targetCurrency);
-                    currencyExchange.setRate(exchangeRate.getRate());
-                    currencyExchange.setAmount(amount);
-                    currencyExchange.setConvertedAmount(exchangeRate.getRate() * amount);
+            ExchangeRate exchangeRate;
+            if (exchangeRateDao.isExchangeRatesExists(baseCurrency.getId(), targetCurrency.getId())) {
+                try {
+                    exchangeRate = exchangeRateDao.getExchangeRateByCode(baseCurrencyCode + targetCurrencyCode);
+                } catch (CurrencyNotFoundException e) {
+                    throw new RuntimeException(e);
                 }
-            } catch (CurrencyNotFoundException e) {
-                System.out.println("We don't have such exchange rate");
+                currencyExchange.setBaseCurrency(baseCurrency);
+                currencyExchange.setTargetCurrency(targetCurrency);
+                currencyExchange.setRate(exchangeRate.getRate());
+                currencyExchange.setAmount(amount);
+                currencyExchange.setConvertedAmount(exchangeRate.getRate() * amount);
+            } else {
+                try {
+                    exchangeRate = exchangeRateDao.getExchangeRateByCode(targetCurrencyCode + baseCurrencyCode);
+                } catch (CurrencyNotFoundException e) {
+                    throw new RuntimeException();
+                }
+                currencyExchange.setBaseCurrency(baseCurrency);
+                currencyExchange.setTargetCurrency(targetCurrency);
+                currencyExchange.setRate(exchangeRate.getRate());
+                currencyExchange.setAmount(amount);
+                currencyExchange.setConvertedAmount(exchangeRate.getRate() / amount);
             }
-
         }
         return currencyExchange;
     }
