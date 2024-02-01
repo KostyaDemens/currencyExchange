@@ -4,6 +4,7 @@ import by.bsuir.kostyademens.currencyexchange.exceptions.CurrencyNotFoundExcepti
 import by.bsuir.kostyademens.currencyexchange.exceptions.DuplicateCurrencyExchangeException;
 import by.bsuir.kostyademens.currencyexchange.model.Currency;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -57,13 +58,13 @@ public class ExchangeRateDao {
 
     }
 
-    public ExchangeRate getExchangeRateByCode(String path) throws CurrencyNotFoundException{
+    public ExchangeRate getExchangeRateByCode(String path) throws CurrencyNotFoundException {
         String baseCurrencyCode = path.substring(0, 3);
         String targetCurrencyCode = path.substring(3, 6);
         CurrencyDao currencyDao = new CurrencyDao();
         Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
         Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
-        if (baseCurrency.getId() == null || targetCurrency.getId() == null ) {
+        if (baseCurrency.getId() == null || targetCurrency.getId() == null) {
             throw new CurrencyNotFoundException("Currency is not exists");
         }
         String SQL = "SELECT * FROM exchangerates WHERE basecurrencyid = ? AND targetcurrencyid = ?";
@@ -145,7 +146,7 @@ public class ExchangeRateDao {
     }
 
 
-    public ExchangeRate changeExchangeRate(String path, float rate) throws CurrencyNotFoundException{
+    public ExchangeRate changeExchangeRate(String path, float rate) throws CurrencyNotFoundException {
         ExchangeRate exchangeRate = getExchangeRateByCode(path);
 
         String SQL = "UPDATE exchangeRates SET rate = ? WHERE id = ?";
@@ -161,5 +162,31 @@ public class ExchangeRateDao {
             throw new RuntimeException();
         }
         return exchangeRate;
+    }
+
+    public List<ExchangeRate> exchangeRateByTargetCurrency(String path) {
+        List<ExchangeRate> exchangeRates = new ArrayList<>();
+        CurrencyDao currencyDao = new CurrencyDao();
+        Currency targetCurrency = currencyDao.getCurrencyByCode(path);
+        ExchangeRate exchangeRate = new ExchangeRate();
+
+        String SQL = "SELECT * FROM exchangerates WHERE targetcurrencyid = ?";
+
+        try (PreparedStatement statement = connection.prepareStatement(SQL)) {
+            statement.setLong(1, targetCurrency.getId());
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                exchangeRate.setId(resultSet.getLong("id"));
+                exchangeRate.setTargetCurrency(targetCurrency);
+                exchangeRate.setRate(resultSet.getFloat("rate"));
+                exchangeRate.setBaseCurrency(currencyDao.getCurrencyById(resultSet.getLong("basecurrencyid")));
+                exchangeRates.add(exchangeRate);
+            }
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException();
+        }
+        return exchangeRates;
     }
 }

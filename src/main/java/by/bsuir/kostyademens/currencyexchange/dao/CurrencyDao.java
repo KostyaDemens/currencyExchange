@@ -95,4 +95,22 @@ public class CurrencyDao {
         }
         return false;
     }
+
+    public Currency getCurrencyById(long id) {
+        Currency currency = new Currency();
+        String SQL = "SELECT * FROM currencies WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(SQL)) {
+            statement.setLong(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                currency.setId(resultSet.getLong("id"));
+                currency.setCode(resultSet.getString("code"));
+                currency.setSign(resultSet.getString("sign"));
+                currency.setFullName(resultSet.getString("fullName"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException();
+        }
+        return currency;
+    }
 }
