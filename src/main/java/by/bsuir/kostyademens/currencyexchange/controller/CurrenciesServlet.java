@@ -35,12 +35,16 @@ public class CurrenciesServlet extends HttpServlet {
 
         CurrencyDao currencyDao = new CurrencyDao();
 
-        Currency currency = currencyDao.addCurrency(code, fullName, sign);
+
         if (code == null || fullName == null || sign == null) {
             resp.sendError(400, "Отсутствует нужное поле формы");
-        } else if (!currencyDao.isCodeExists(code)) {
-            resp.sendError(500);
+            return;
+        } else if (currencyDao.isCodeExists(code)) {
+            resp.sendError(409, "Валюта с таким кодом уже существует");
+            return;
         }
+
+        Currency currency = currencyDao.addCurrency(code, fullName, sign);
 
         JSONObject jsonObject = new JSONObject(currency);
         resp.setContentType("application/json");

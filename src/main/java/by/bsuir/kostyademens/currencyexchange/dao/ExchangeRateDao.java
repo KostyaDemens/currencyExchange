@@ -164,11 +164,10 @@ public class ExchangeRateDao {
         return exchangeRate;
     }
 
-    public List<ExchangeRate> exchangeRateByTargetCurrency(String path) {
+    public List<ExchangeRate> exchangeRateListByCurrency(String path) {
         List<ExchangeRate> exchangeRates = new ArrayList<>();
         CurrencyDao currencyDao = new CurrencyDao();
         Currency targetCurrency = currencyDao.getCurrencyByCode(path);
-        ExchangeRate exchangeRate = new ExchangeRate();
 
         String SQL = "SELECT * FROM exchangerates WHERE targetcurrencyid = ?";
 
@@ -176,6 +175,7 @@ public class ExchangeRateDao {
             statement.setLong(1, targetCurrency.getId());
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
+                ExchangeRate exchangeRate = new ExchangeRate();
                 exchangeRate.setId(resultSet.getLong("id"));
                 exchangeRate.setTargetCurrency(targetCurrency);
                 exchangeRate.setRate(resultSet.getFloat("rate"));

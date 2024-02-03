@@ -1,9 +1,5 @@
 package by.bsuir.kostyademens.currencyexchange.model;
 
-
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
-@JsonPropertyOrder({"id", "baseCurrency", "targetCurrency", "rate"})
 public class ExchangeRate {
 
     private long id;

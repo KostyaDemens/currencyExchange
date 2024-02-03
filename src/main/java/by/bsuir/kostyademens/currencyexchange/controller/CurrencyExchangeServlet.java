@@ -22,6 +22,11 @@ public class CurrencyExchangeServlet extends HttpServlet {
         String targetCurrencyCode = req.getParameter("to");
         String amount = req.getParameter("amount");
 
+        if (baseCurrencyCode == null || targetCurrencyCode == null || amount == null) {
+            resp.sendError(400, "Отсутствует нужное поле формы");
+            return;
+        }
+
         CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
         CurrencyExchange currencyExchange = currencyExchangeDao.exchangeCurrency(baseCurrencyCode, targetCurrencyCode, Float.parseFloat(amount));
 

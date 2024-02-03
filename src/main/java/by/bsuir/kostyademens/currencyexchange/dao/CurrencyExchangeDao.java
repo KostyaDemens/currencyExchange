@@ -5,6 +5,8 @@ import by.bsuir.kostyademens.currencyexchange.model.Currency;
 import by.bsuir.kostyademens.currencyexchange.model.CurrencyExchange;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
 
+import java.util.List;
+
 public class CurrencyExchangeDao {
     private static final CurrencyDao currencyDao = new CurrencyDao();
     private static final ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
@@ -30,7 +32,7 @@ public class CurrencyExchangeDao {
                 currencyExchange.setRate(exchangeRate.getRate());
                 currencyExchange.setAmount(amount);
                 currencyExchange.setConvertedAmount(exchangeRate.getRate() * amount);
-            } else {
+            } else if (!exchangeRateDao.isExchangeRatesExists(baseCurrency.getId(), targetCurrency.getId())) {
                 try {
                     exchangeRate = exchangeRateDao.getExchangeRateByCode(targetCurrencyCode + baseCurrencyCode);
                 } catch (CurrencyNotFoundException e) {
@@ -41,6 +43,24 @@ public class CurrencyExchangeDao {
                 currencyExchange.setRate(exchangeRate.getRate());
                 currencyExchange.setAmount(amount);
                 currencyExchange.setConvertedAmount(exchangeRate.getRate() / amount);
+                if (currencyExchange.getRate() == 0) {
+                    float rate;
+                    List<ExchangeRate> baseCurrencyList = exchangeRateDao.exchangeRateListByCurrency(baseCurrencyCode);
+                    List<ExchangeRate> targetCurrencyList = exchangeRateDao.exchangeRateListByCurrency(targetCurrencyCode);
+
+                    for (ExchangeRate baseRate : baseCurrencyList) {
+                        for (ExchangeRate targetRate : targetCurrencyList) {
+                            if (baseRate.getBaseCurrency().getId().equals(targetRate.getBaseCurrency().getId())) {
+                                rate = targetRate.getRate() / baseRate.getRate();
+                                currencyExchange.setBaseCurrency(baseRate.getTargetCurrency());
+                                currencyExchange.setTargetCurrency(targetRate.getTargetCurrency());
+                                currencyExchange.setRate(rate);
+                                currencyExchange.setAmount(amount);
+                                currencyExchange.setConvertedAmount(rate * amount);
+                            }
+                        }
+                    }
+                }
             }
         }
         return currencyExchange;

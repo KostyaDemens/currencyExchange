@@ -1,5 +1,6 @@
 package by.bsuir.kostyademens.currencyexchange.controller;
 
+import by.bsuir.kostyademens.currencyexchange.dao.CurrencyDao;
 import by.bsuir.kostyademens.currencyexchange.dao.ExchangeRateDao;
 import by.bsuir.kostyademens.currencyexchange.exceptions.CurrencyNotFoundException;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
@@ -20,21 +21,28 @@ public class ExchangeRateByCodeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getPathInfo().substring(1);
         ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
+        CurrencyDao currencyDao = new CurrencyDao();
+
+        if (path.isEmpty()) {
+            resp.sendError(400, "Валютная пара отстутсвтует в адресе");
+            return;
+        } else if (!exchangeRateDao.isExchangeRatesExists(currencyDao.getCurrencyByCode(path.substring(0, 3)).getId(), currencyDao.getCurrencyByCode(path.substring(3, 6)).getId())) {
+            resp.sendError(404, "Такой валютной пары не существует");
+            return;
+        }
 
         try {
             ExchangeRate exchangeRate = exchangeRateDao.getExchangeRateByCode(path);
             JSONObject jsonObject = new JSONObject(exchangeRate);
             resp.setContentType("application/json");
-            if (path.isEmpty()) {
-                resp.sendError(400);
-            } else {
-                PrintWriter pw = resp.getWriter();
-                pw.println(jsonObject);
-            }
+            PrintWriter pw = resp.getWriter();
+            pw.println(jsonObject);
+
         } catch (CurrencyNotFoundException e) {
             resp.sendError(404);
             System.out.println(e.getMessage());
         }
+
     }
 
 
@@ -43,19 +51,22 @@ public class ExchangeRateByCodeServlet extends HttpServlet {
         String rate = req.getParameter("rate");
 
         ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
+        CurrencyDao currencyDao = new CurrencyDao();
 
+        if (rate == null) {
+            resp.sendError(400, "Отсутствует нужное поле формы");
+            return;
+        } else if (!exchangeRateDao.isExchangeRatesExists(currencyDao.getCurrencyByCode(path.substring(0, 3)).getId(), currencyDao.getCurrencyByCode(path.substring(3, 6)).getId())) {
+            resp.sendError(404, "Такой валютной пары не существует");
+            return;
+        }
 
         try {
-            if (rate != null) {
-                ExchangeRate exchangeRate = exchangeRateDao.changeExchangeRate(path, Float.parseFloat(rate));
-                JSONObject jsonObject = new JSONObject(exchangeRate);
-                resp.setContentType("application/json");
-                PrintWriter printWriter = resp.getWriter();
-                printWriter.println(jsonObject);
-
-            } else {
-                resp.sendError(400);
-            }
+            ExchangeRate exchangeRate = exchangeRateDao.changeExchangeRate(path, Float.parseFloat(rate));
+            JSONObject jsonObject = new JSONObject(exchangeRate);
+            resp.setContentType("application/json");
+            PrintWriter printWriter = resp.getWriter();
+            printWriter.println(jsonObject);
         } catch (CurrencyNotFoundException e) {
             throw new RuntimeException(e);
         }
