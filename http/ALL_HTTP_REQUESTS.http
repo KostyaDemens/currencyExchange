@@ -5,22 +5,22 @@ GET http://localhost:8080/currencies
 GET http://localhost:8080/currency/BAM
 
 ### add new currency
-POST http://localhost:8080/currencies?code=BAM&name=Convertible Mark&sign=KM
+POST http://localhost:8080/currencies?code=BYN&name=Belarussian ruble&sign=Br
 
 ### get list of exchange rates
 GET http://localhost:8080/exchangeRates
 
 ### get exchange rate by code
-GET http://localhost:8080/exchangeRate/AUDEUR
+GET http://localhost:8080/exchangeRate/BYNBAM
 
 ### add new exchange rate
-POST http://localhost:8080/exchangeRates?baseCurrencyCode=BZD&targetCurrencyCode=EUR&rate=2.36
+POST http://localhost:8080/exchangeRates?baseCurrencyCode=BYN&targetCurrencyCode=BAM&rate=2.36
 
 ### change exchange rate
-PATCH http://localhost:8080/exchangeRate/AUDBZD?rate=2.2
+PATCH http://localhost:8080/exchangeRate/BYNBAM?rate=2.2
 
 ### currency exchange
-GET http://localhost:8080/exchange?from=EUR&to=BYN&amount=10
+GET http://localhost:8080/exchange?from=BAM&to=BYN&amount=10
 
 
 ///   ERRORS AND CRITICAL SITUATIONS   ///

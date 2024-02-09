@@ -64,7 +64,7 @@ public class ExchangeRateByCodeServlet extends HttpServlet {
         }
 
         try {
-            ExchangeRate exchangeRate = exchangeRateDao.changeExchangeRate(path, BigDecimal.valueOf(Long.parseLong(rate)));
+            ExchangeRate exchangeRate = exchangeRateDao.changeExchangeRate(path, new BigDecimal(rate));
             rendererResponse(resp, exchangeRate);
         } catch (CurrencyNotFoundException e) {
             throw new RuntimeException(e);

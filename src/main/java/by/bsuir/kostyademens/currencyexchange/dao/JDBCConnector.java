@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class JDBCConnector {
 
-    private static final String URL = "jdbc:sqlite:/D:/SQLite/second.db";
+    private static final String URL = "jdbc:sqlite::resource:CurrencyExchangeDB.db";
 
     public static final Connection connection;
 
