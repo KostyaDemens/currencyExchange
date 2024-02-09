@@ -1,37 +1,82 @@
-// get list of all currencies
+### get list of all currencies
 GET http://localhost:8080/currencies
 
-###
-
-// get currency by code
+### get currency by code
 GET http://localhost:8080/currency/USD
 
-###
+### add new currency
+POST http://localhost:8080/currencies?code=BAM&name=Convertible Mark&sign=KM
 
-// add currency
-POST http://localhost:8080/currencies?code=BAM&fullName=Convertible Mark&sign=KM
-
-###
-
-// get exchange rates
+### get list of exchange rates
 GET http://localhost:8080/exchangeRates
 
-###
-
-// get exchange rate by code
+### get exchange rate by code
 GET http://localhost:8080/exchangeRate/AUDEUR
 
-###
-
-// add new exchange rate
+### add new exchange rate
 POST http://localhost:8080/exchangeRates?baseCurrencyCode=BZD&targetCurrencyCode=EUR&rate=2.36
 
-###
-
-// change exchange rate
+### change exchange rate
 PATCH http://localhost:8080/exchangeRate/AUDBZD?rate=2.2
 
-###
-
-// currency exchange
+### currency exchange
 GET http://localhost:8080/exchange?from=EUR&to=BYN&amount=10
+
+
+///   ERRORS AND CRITICAL SITUATIONS   ///
+
+
+/// GET CURRENCY BY CODE
+
+
+### currency code is missing from the address (expected: 400)
+GET http://localhost:8080/currency/
+
+### currency is not found (expected: 404)
+GET http://localhost:8080/currency/WWW
+
+
+/// ADD NEW CURRENCY
+
+
+### a required form field is missing (expected: 400)
+POST http://localhost:8080/currencies?code=BAM&name=Convertible Mark
+
+### currency already exists (expected: 409)
+POST http://localhost:8080/currencies?code=BYN&name=Belarussian Ruble&sign=Br
+
+
+/// GET EXCHANGE RATE BY CODE
+
+
+### pair of currencies are missing from the address (expected: 400)
+GET http://localhost:8080/exchangeRate/
+
+### exchange rate is not found (expected: 404)
+GET http://localhost:8080/exchangeRate/KZTAUD
+
+### exchange rate is not found bc currency is not exists (expected: 500)
+GET http://localhost:8080/exchangeRate/WWWWWW
+
+
+/// ADD NEW EXCHANGE RATE
+
+
+### a required form field is missing (expected: 400)
+POST http://localhost:8080/exchangeRates?baseCurrencyCode=BZD&targetCurrencyCode=EUR
+
+### exchange rate already exists (expected: 409)
+POST http://localhost:8080/exchangeRates?baseCurrencyCode=AUD&targetCurrencyCode=EUR&rate=4
+
+### one or two currencies from the address are not exists (expected: 404)
+POST http://localhost:8080/exchangeRates?baseCurrencyCode=WWW&targetCurrencyCode=EUR&rate=4
+
+
+/// CHANGE EXCHANGE RATE
+
+
+### a required form field is missing (expected: 400)
+PATCH http://localhost:8080/exchangeRate/AUDBZD
+
+### exchange rate is not found (expected: 404)
+PATCH http://localhost:8080/exchangeRate/BZDAUD?rate=4

@@ -2,7 +2,7 @@ package by.bsuir.kostyademens.currencyexchange.model;
 
 public class Currency {
     private Long id;
-    private String fullName;
+    private String name;
     private String code;
     private String sign;
 
@@ -30,17 +30,17 @@ public class Currency {
         this.id = id;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getName() {
+        return name;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Currency(Long id, String fullName, String code, String sign) {
+    public Currency(Long id, String name, String code, String sign) {
         this.id = id;
-        this.fullName = fullName;
+        this.name = name;
         this.code = code;
         this.sign = sign;
     }

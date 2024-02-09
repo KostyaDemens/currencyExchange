@@ -7,28 +7,27 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
-    @WebServlet("/currency/*")
+import static by.bsuir.kostyademens.currencyexchange.utils.ObjectRenderer.rendererResponse;
+import static by.bsuir.kostyademens.currencyexchange.utils.ErrorRenderer.sendError;
+
+@WebServlet("/currency/*")
 public class CurrencyByCodeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getPathInfo().substring(1);
         CurrencyDao currencyDao = new CurrencyDao();
-        Currency currency = currencyDao.getCurrencyByCode(path);
-        JSONObject jsonObject = new JSONObject(currency);
-        resp.setContentType("application/json");
+
+
         if (path.isEmpty()) {
-            resp.sendError(400);
-        } else if (jsonObject.isEmpty()) {
-            resp.sendError(404);
+            sendError(resp, 400, "Код валюты отсутствует в адресе");
+        } else if (!currencyDao.isCodeExists(path)) {
+            sendError(resp, 404, "Валюта не найдена");
         } else {
-            PrintWriter out = resp.getWriter();
-            out.println(jsonObject);
+            Currency currency = currencyDao.getCurrencyByCode(path);
+            rendererResponse(resp, currency);
         }
     }
 }
-

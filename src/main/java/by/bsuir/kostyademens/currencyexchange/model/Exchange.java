@@ -1,11 +1,14 @@
 package by.bsuir.kostyademens.currencyexchange.model;
 
-public class CurrencyExchange {
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+public class Exchange {
     private Currency baseCurrency;
     private Currency targetCurrency;
-    private float rate;
-    private float amount;
-    private float convertedAmount;
+    private BigDecimal rate;
+    private BigDecimal amount;
+    private BigDecimal convertedAmount;
 
     public Currency getBaseCurrency() {
         return baseCurrency;
@@ -23,31 +26,31 @@ public class CurrencyExchange {
         this.targetCurrency = targetCurrency;
     }
 
-    public float getRate() {
+    public BigDecimal getRate() {
         return rate;
     }
 
-    public void setRate(float rate) {
-        this.rate = rate;
+    public void setRate(BigDecimal rate) {
+        this.rate = rate.setScale(2, RoundingMode.HALF_UP);
     }
 
-    public float getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(float amount) {
-        this.amount = amount;
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount.setScale(2, RoundingMode.HALF_UP);
     }
 
-    public float getConvertedAmount() {
+    public BigDecimal getConvertedAmount() {
         return convertedAmount;
     }
 
-    public void setConvertedAmount(float convertedAmount) {
-        this.convertedAmount = convertedAmount;
+    public void setConvertedAmount(BigDecimal convertedAmount) {
+        this.convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
     }
 
-    public CurrencyExchange(Currency baseCurrency, Currency targetCurrency, float rate, float amount, float convertedAmount) {
+    public Exchange(Currency baseCurrency, Currency targetCurrency, BigDecimal rate, BigDecimal amount, BigDecimal convertedAmount) {
         this.baseCurrency = baseCurrency;
         this.targetCurrency = targetCurrency;
         this.rate = rate;
@@ -55,6 +58,6 @@ public class CurrencyExchange {
         this.convertedAmount = convertedAmount;
     }
 
-    public CurrencyExchange() {
+    public Exchange() {
     }
 }

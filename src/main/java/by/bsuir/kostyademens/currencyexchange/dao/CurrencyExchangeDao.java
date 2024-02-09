@@ -2,9 +2,11 @@ package by.bsuir.kostyademens.currencyexchange.dao;
 
 import by.bsuir.kostyademens.currencyexchange.exceptions.CurrencyNotFoundException;
 import by.bsuir.kostyademens.currencyexchange.model.Currency;
-import by.bsuir.kostyademens.currencyexchange.model.CurrencyExchange;
+import by.bsuir.kostyademens.currencyexchange.model.Exchange;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class CurrencyExchangeDao {
@@ -12,57 +14,54 @@ public class CurrencyExchangeDao {
     private static final ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
 
 
-    public CurrencyExchange exchangeCurrency(String baseCurrencyCode, String targetCurrencyCode, float amount) {
-        CurrencyExchange currencyExchange = new CurrencyExchange();
-
-        Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
-        Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
+    public Exchange exchangeCurrency(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
+        Exchange exchange = new Exchange();
 
 
         if (currencyDao.isCodeExists(baseCurrencyCode) && currencyDao.isCodeExists(targetCurrencyCode)) {
+
+            Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
+            Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
+
             ExchangeRate exchangeRate;
-            if (exchangeRateDao.isExchangeRatesExists(baseCurrency.getId(), targetCurrency.getId())) {
+            if (exchangeRateDao.isExchangeRateExists(baseCurrency.getId(), targetCurrency.getId())) {
                 try {
                     exchangeRate = exchangeRateDao.getExchangeRateByCode(baseCurrencyCode + targetCurrencyCode);
                 } catch (CurrencyNotFoundException e) {
                     throw new RuntimeException(e);
                 }
-                currencyExchange.setBaseCurrency(baseCurrency);
-                currencyExchange.setTargetCurrency(targetCurrency);
-                currencyExchange.setRate(exchangeRate.getRate());
-                currencyExchange.setAmount(amount);
-                currencyExchange.setConvertedAmount(exchangeRate.getRate() * amount);
-            } else if (!exchangeRateDao.isExchangeRatesExists(baseCurrency.getId(), targetCurrency.getId())) {
-                try {
-                    exchangeRate = exchangeRateDao.getExchangeRateByCode(targetCurrencyCode + baseCurrencyCode);
-                } catch (CurrencyNotFoundException e) {
-                    throw new RuntimeException();
-                }
-                currencyExchange.setBaseCurrency(baseCurrency);
-                currencyExchange.setTargetCurrency(targetCurrency);
-                currencyExchange.setRate(exchangeRate.getRate());
-                currencyExchange.setAmount(amount);
-                currencyExchange.setConvertedAmount(exchangeRate.getRate() / amount);
-                if (currencyExchange.getRate() == 0) {
-                    float rate;
-                    List<ExchangeRate> baseCurrencyList = exchangeRateDao.exchangeRateListByCurrency(baseCurrencyCode);
-                    List<ExchangeRate> targetCurrencyList = exchangeRateDao.exchangeRateListByCurrency(targetCurrencyCode);
+                exchange.setBaseCurrency(baseCurrency);
+                exchange.setTargetCurrency(targetCurrency);
+                exchange.setRate(exchangeRate.getRate());
+                exchange.setAmount(amount);
+                exchange.setConvertedAmount(exchangeRate.getRate().multiply(amount));
+            } else if (exchangeRateDao.isExchangeRateExists(targetCurrency.getId(), baseCurrency.getId())) {
+                exchangeRate = exchangeRateDao.getExchangeRateByCode(targetCurrencyCode + baseCurrencyCode);
+                exchange.setBaseCurrency(baseCurrency);
+                exchange.setTargetCurrency(targetCurrency);
+                exchange.setRate(exchangeRate.getRate());
+                exchange.setAmount(amount);
+                exchange.setConvertedAmount(exchangeRate.getRate().divide(amount, 7, RoundingMode.DOWN));
+            } else {
+                    BigDecimal rate;
+                    List<ExchangeRate> baseCurrencyList = exchangeRateDao.getExchangeRatesByCurrency(baseCurrencyCode);
+                    List<ExchangeRate> targetCurrencyList = exchangeRateDao.getExchangeRatesByCurrency(targetCurrencyCode);
 
                     for (ExchangeRate baseRate : baseCurrencyList) {
                         for (ExchangeRate targetRate : targetCurrencyList) {
                             if (baseRate.getBaseCurrency().getId().equals(targetRate.getBaseCurrency().getId())) {
-                                rate = targetRate.getRate() / baseRate.getRate();
-                                currencyExchange.setBaseCurrency(baseRate.getTargetCurrency());
-                                currencyExchange.setTargetCurrency(targetRate.getTargetCurrency());
-                                currencyExchange.setRate(rate);
-                                currencyExchange.setAmount(amount);
-                                currencyExchange.setConvertedAmount(rate * amount);
+                                rate = targetRate.getRate().divide(baseRate.getRate(), 7, RoundingMode.DOWN);
+                                exchange.setBaseCurrency(baseRate.getTargetCurrency());
+                                exchange.setTargetCurrency(targetRate.getTargetCurrency());
+                                exchange.setRate(rate);
+                                exchange.setAmount(amount);
+                                exchange.setConvertedAmount(rate.multiply(amount));
+                                return exchange;
                             }
                         }
                     }
                 }
             }
-        }
-        return currencyExchange;
+        return exchange;
     }
 }
