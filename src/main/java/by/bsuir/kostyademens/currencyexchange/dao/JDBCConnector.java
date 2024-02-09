@@ -6,20 +6,18 @@ import java.sql.SQLException;
 
 public class JDBCConnector {
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/first_db";
-    private static final String USERNAME = "postgres";
-    private static final String PASSWORD = "admin";
+    private static final String URL = "jdbc:sqlite:/D:/SQLite/second.db";
 
     public static final Connection connection;
 
     static {
         try {
-            Class.forName("org.postgresql.Driver");
+            Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
         try {
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+            connection = DriverManager.getConnection(URL);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

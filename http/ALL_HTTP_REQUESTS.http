@@ -2,7 +2,7 @@
 GET http://localhost:8080/currencies
 
 ### get currency by code
-GET http://localhost:8080/currency/USD
+GET http://localhost:8080/currency/BAM
 
 ### add new currency
 POST http://localhost:8080/currencies?code=BAM&name=Convertible Mark&sign=KM
