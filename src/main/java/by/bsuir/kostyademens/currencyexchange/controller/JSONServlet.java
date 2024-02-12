@@ -47,6 +47,14 @@ public class JSONServlet extends HttpServlet {
             this.doPost(req, resp);
         } else if (method.equals("GET")) {
             this.doGet(req, resp);
+        } else if (method.equals("PATCH")) {
+            this.doPatch(req, resp);
+        } else {
+            super.service(req,resp);
         }
+    }
+
+    protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.sendError(405, "Patch method not supported");
     }
 }

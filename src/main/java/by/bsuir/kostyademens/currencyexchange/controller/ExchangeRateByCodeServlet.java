@@ -67,16 +67,5 @@ public class ExchangeRateByCodeServlet extends JSONServlet {
 
     }
 
-    @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String method = req.getMethod();
-        if (method.equals("PATCH")) {
-            this.doPatch(req, resp);
-        } else if (method.equals("GET")) {
-            this.doGet(req, resp);
-        }
-
-    }
-
 
 }
