@@ -1,8 +1,6 @@
 package by.bsuir.kostyademens.currencyexchange.dao;
 
-import by.bsuir.kostyademens.currencyexchange.exceptions.CurrencyNotFoundException;
-import by.bsuir.kostyademens.currencyexchange.exceptions.DuplicateExchangeRateException;
-import by.bsuir.kostyademens.currencyexchange.exceptions.ExchangeRateNotFoundException;
+import by.bsuir.kostyademens.currencyexchange.exceptions.*;
 import by.bsuir.kostyademens.currencyexchange.model.Currency;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
 
@@ -114,7 +112,7 @@ public class ExchangeRateDao {
             int affectedRows = preparedStatement.executeUpdate();
 
             if (affectedRows == 0) {
-                throw new SQLException();
+                throw new NoRowsAffectedException("No rows where affected by the update operation.");
             }
 
             try (ResultSet resultSet = preparedStatement.getGeneratedKeys()) {
@@ -129,7 +127,9 @@ public class ExchangeRateDao {
 
 
         } catch (SQLException e) {
-            throw new RuntimeException();
+            if (e.getErrorCode() == 19) {
+                throw new DuplicateCurrencyException("Currency with such code already exists");
+            }
         }
         return exchangeRate;
     }

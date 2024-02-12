@@ -1,5 +1,6 @@
 package by.bsuir.kostyademens.currencyexchange.controller;
 
+import by.bsuir.kostyademens.currencyexchange.exceptions.DuplicateCurrencyException;
 import by.bsuir.kostyademens.currencyexchange.model.Currency;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -28,15 +29,15 @@ public class CurrenciesServlet extends JSONServlet {
         if (code == null || name == null || sign == null) {
             sendError(resp, 400, "Отсутствует нужное поле формы");
             return;
-        } else if (currencyDao.isCodeExists(code)) {
-            sendError(resp, 409, "Валюта с таким кодом уже существует");
-            return;
         }
 
-        Currency currency = currencyDao.addCurrency(code, name, sign);
 
-        sendResponse(resp, currency);
-
-
+        try {
+            Currency currency = currencyDao.addCurrency(code, name, sign);
+            sendResponse(resp, currency);
+        } catch (DuplicateCurrencyException e) {
+            sendError(resp, 409, "Такая валюта уже существует");
+            e.printStackTrace();
+        }
     }
 }
