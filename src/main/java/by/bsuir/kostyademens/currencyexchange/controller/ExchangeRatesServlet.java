@@ -6,7 +6,6 @@ import by.bsuir.kostyademens.currencyexchange.exceptions.DuplicateExchangeRateEx
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -14,17 +13,14 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static by.bsuir.kostyademens.currencyexchange.utils.ObjectRenderer.rendererResponse;
-import static by.bsuir.kostyademens.currencyexchange.utils.ErrorRenderer.sendError;
 
 @WebServlet("/exchangeRates")
-public class ExchangeRatesServlet extends HttpServlet {
+public class ExchangeRatesServlet extends JSONServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
         List<ExchangeRate> exchangeRates = exchangeRateDao.getAllExchangeRates();
-        rendererResponse(resp, exchangeRates);
+        sendResponse(resp, exchangeRates);
     }
 
     @Override
@@ -38,17 +34,16 @@ public class ExchangeRatesServlet extends HttpServlet {
             return;
         }
 
-        ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
+
         try {
             ExchangeRate exchangeRate = exchangeRateDao.addExchangeRate(baseCurrencyCode, targetCurrencyCode, new BigDecimal(rate));
-            resp.setStatus(201);
-            rendererResponse(resp, exchangeRate);
+            sendResponse(resp, exchangeRate);
         } catch (DuplicateExchangeRateException e) {
             sendError(resp, 409, "Такая валютная пара уже существует");
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         } catch (CurrencyNotFoundException e) {
             sendError(resp, 404, "Валюта не найдена");
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 }

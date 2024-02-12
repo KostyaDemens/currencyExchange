@@ -38,13 +38,6 @@ public class Currency {
         this.name = name;
     }
 
-    public Currency(Long id, String name, String code, String sign) {
-        this.id = id;
-        this.name = name;
-        this.code = code;
-        this.sign = sign;
-    }
-
     public Currency() {
     }
 }

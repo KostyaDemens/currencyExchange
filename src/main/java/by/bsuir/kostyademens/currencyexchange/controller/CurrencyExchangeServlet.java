@@ -5,18 +5,16 @@ import by.bsuir.kostyademens.currencyexchange.dao.CurrencyExchangeDao;
 import by.bsuir.kostyademens.currencyexchange.model.Exchange;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 
-import static by.bsuir.kostyademens.currencyexchange.utils.ObjectRenderer.rendererResponse;
-import static by.bsuir.kostyademens.currencyexchange.utils.ErrorRenderer.sendError;
+
 
 @WebServlet("/exchange/*")
-public class CurrencyExchangeServlet extends HttpServlet {
+public class CurrencyExchangeServlet extends JSONServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -29,10 +27,9 @@ public class CurrencyExchangeServlet extends HttpServlet {
             return;
         }
 
-        CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
         Exchange exchange = currencyExchangeDao.exchangeCurrency(baseCurrencyCode, targetCurrencyCode, BigDecimal.valueOf(Long.parseLong(amount)));
 
-        rendererResponse(resp, exchange);
+        sendResponse(resp, exchange);
 
 
     }

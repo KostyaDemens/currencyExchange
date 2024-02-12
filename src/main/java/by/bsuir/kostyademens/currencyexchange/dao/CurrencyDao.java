@@ -1,6 +1,7 @@
 package by.bsuir.kostyademens.currencyexchange.dao;
 
 import by.bsuir.kostyademens.currencyexchange.exceptions.CurrencyNotFoundException;
+import by.bsuir.kostyademens.currencyexchange.exceptions.DuplicateCurrencyException;
 import by.bsuir.kostyademens.currencyexchange.exceptions.NoRowsAffectedException;
 import by.bsuir.kostyademens.currencyexchange.model.Currency;
 
@@ -76,13 +77,14 @@ public class CurrencyDao {
                     currency.setSign(sign);
                     currency.setId(id);
 
-                } else {
-                    throw new SQLException();
                 }
-
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (e.getErrorCode() == 19) {
+                throw new DuplicateCurrencyException("Currency with such code already exists");
+            }
         }
         return currency;
     }
