@@ -1,8 +1,7 @@
 package by.bsuir.kostyademens.currencyexchange.controller;
 
-import by.bsuir.kostyademens.currencyexchange.dao.CurrencyDao;
-import by.bsuir.kostyademens.currencyexchange.dao.ExchangeRateDao;
-import by.bsuir.kostyademens.currencyexchange.exceptions.CurrencyNotFoundException;
+import by.bsuir.kostyademens.currencyexchange.exception.CurrencyNotFoundException;
+import by.bsuir.kostyademens.currencyexchange.exception.ExchangeRateNotFoundException;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,23 +19,18 @@ public class ExchangeRateByCodeServlet extends JSONServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getPathInfo().substring(1);
 
-        if (path.isEmpty()) {
-            sendError(resp,400, "Валютная пара отстутсвтует в адресе");
-            return;
-        } else if (!currencyDao.isCodeExists(path.substring(0, 3)) || !currencyDao.isCodeExists(path.substring(3, 6))) {
-            sendError(resp, 404, "Валюта с кодом: " + path.substring(0, 3) + " или с кодом: " + path.substring(3, 6) + " не существует");
-            return;
-        } else if (!exchangeRateDao.isExchangeRateExists(currencyDao.getCurrencyByCode(path.substring(0, 3)).getId(), currencyDao.getCurrencyByCode(path.substring(3, 6)).getId())) {
-            sendError(resp,404, "Такой валютной пары не существует");
-            return;
-        }
-
         try {
-            ExchangeRate exchangeRate = exchangeRateDao.getExchangeRateByCode(path);
+            if (path.isEmpty()) {
+                sendError(resp, 400, "Валютная пара отстутсвтует в адресе");
+                return;
+            }
+            ExchangeRate exchangeRate = exchangeRateService.getExchangeRateByCode(path);
             sendResponse(resp, exchangeRate);
-
         } catch (CurrencyNotFoundException e) {
-            sendError(resp, 404, "Валюта не найдена");
+            sendError(resp, 404, "Валюты с таким кодом нету в базе данных");
+            e.printStackTrace();
+        } catch (ExchangeRateNotFoundException e) {
+            sendError(resp, 404, "Валютной пары с таким кодом нету в базе данных");
             e.printStackTrace();
         }
 
@@ -48,24 +42,21 @@ public class ExchangeRateByCodeServlet extends JSONServlet {
         String rate = req.getParameter("rate");
 
 
-        if (rate == null) {
-            sendError(resp,400, "Отсутствует нужное поле формы");
-            return;
-        } else if (!exchangeRateDao.isExchangeRateExists(currencyDao.getCurrencyByCode(path.substring(0, 3)).getId(), currencyDao.getCurrencyByCode(path.substring(3, 6)).getId())) {
-            sendError(resp,404, "Такой валютной пары не существует");
-            return;
-        }
-
         try {
-            ExchangeRate exchangeRate = exchangeRateDao.changeExchangeRate(path, new BigDecimal(rate));
+            if (rate == null) {
+                sendError(resp, 400, "Отсутствует нужное поле формы");
+                return;
+            }
+            ExchangeRate exchangeRate = exchangeRateService.changeExchangeRate(path, new BigDecimal(rate));
             sendResponse(resp, exchangeRate);
+        } catch (ExchangeRateNotFoundException e) {
+            sendError(resp, 404, "Валютной пары с таким кодом нету в базе данных");
+            e.printStackTrace();
         } catch (CurrencyNotFoundException e) {
-            sendError(resp, 404, "Валюта не найдена");
+            sendError(resp, 404, "Валюты с таким кодом нету в базе данных");
             e.printStackTrace();
         }
 
-
     }
-
 
 }

@@ -1,4 +1,4 @@
-package by.bsuir.kostyademens.currencyexchange.exceptions;
+package by.bsuir.kostyademens.currencyexchange.exception;
 
 public class CurrencyNotFoundException extends RuntimeException {
 

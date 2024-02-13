@@ -1,9 +1,9 @@
 package by.bsuir.kostyademens.currencyexchange.controller;
 
-import by.bsuir.kostyademens.currencyexchange.dao.CurrencyDao;
-import by.bsuir.kostyademens.currencyexchange.dao.CurrencyExchangeDao;
-import by.bsuir.kostyademens.currencyexchange.dao.ExchangeRateDao;
 import by.bsuir.kostyademens.currencyexchange.model.Error;
+import by.bsuir.kostyademens.currencyexchange.service.CurrencyService;
+import by.bsuir.kostyademens.currencyexchange.service.ExchangeRateService;
+import by.bsuir.kostyademens.currencyexchange.service.CurrencyExchangeService;
 import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -16,9 +16,9 @@ import java.io.PrintWriter;
 
 public class JSONServlet extends HttpServlet {
 
-    protected CurrencyDao currencyDao = new CurrencyDao();
-    protected CurrencyExchangeDao currencyExchangeDao = new CurrencyExchangeDao();
-    protected ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
+    protected CurrencyService currencyService = new CurrencyService();
+    protected ExchangeRateService exchangeRateService = new ExchangeRateService();
+    protected CurrencyExchangeService currencyExchangeService = new CurrencyExchangeService();
 
     protected void sendResponse(HttpServletResponse resp, Object object) throws IOException {
         String json = new Gson().toJson(object);
@@ -42,15 +42,20 @@ public class JSONServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String method = req.getMethod();
-        if (method.equals("POST")) {
-            resp.setStatus(201);
-            this.doPost(req, resp);
-        } else if (method.equals("GET")) {
-            this.doGet(req, resp);
-        } else if (method.equals("PATCH")) {
-            this.doPatch(req, resp);
-        } else {
-            super.service(req,resp);
+        switch (method) {
+            case "POST":
+                resp.setStatus(201);
+                this.doPost(req, resp);
+                break;
+            case "GET":
+                this.doGet(req, resp);
+                break;
+            case "PATCH":
+                this.doPatch(req, resp);
+                break;
+            default:
+                super.service(req, resp);
+                break;
         }
     }
 

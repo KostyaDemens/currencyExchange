@@ -14,7 +14,7 @@ GET http://localhost:8080/exchangeRates
 GET http://localhost:8080/exchangeRate/BYNBAM
 
 ### add new exchange rate
-POST http://localhost:8080/exchangeRates?baseCurrencyCode=BYN&targetCurrencyCode=BAM&rate=2.36
+POST http://localhost:8080/exchangeRates?base_code=BYN&target_code=BAM&rate=2.36
 
 ### change exchange rate
 PATCH http://localhost:8080/exchangeRate/BYNBAM?rate=2.2

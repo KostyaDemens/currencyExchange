@@ -1,6 +1,6 @@
 package by.bsuir.kostyademens.currencyexchange.dao;
 
-import by.bsuir.kostyademens.currencyexchange.exceptions.*;
+import by.bsuir.kostyademens.currencyexchange.exception.*;
 import by.bsuir.kostyademens.currencyexchange.model.Currency;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
 

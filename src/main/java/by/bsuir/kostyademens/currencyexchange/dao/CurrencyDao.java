@@ -1,8 +1,8 @@
 package by.bsuir.kostyademens.currencyexchange.dao;
 
-import by.bsuir.kostyademens.currencyexchange.exceptions.CurrencyNotFoundException;
-import by.bsuir.kostyademens.currencyexchange.exceptions.DuplicateCurrencyException;
-import by.bsuir.kostyademens.currencyexchange.exceptions.NoRowsAffectedException;
+import by.bsuir.kostyademens.currencyexchange.exception.CurrencyNotFoundException;
+import by.bsuir.kostyademens.currencyexchange.exception.DuplicateCurrencyException;
+import by.bsuir.kostyademens.currencyexchange.exception.NoRowsAffectedException;
 import by.bsuir.kostyademens.currencyexchange.model.Currency;
 
 import java.sql.*;
