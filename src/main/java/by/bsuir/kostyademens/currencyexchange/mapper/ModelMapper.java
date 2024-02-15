@@ -1,4 +1,4 @@
-package by.bsuir.kostyademens.currencyexchange.mappers;
+package by.bsuir.kostyademens.currencyexchange.mapper;
 
 import by.bsuir.kostyademens.currencyexchange.dto.CurrencyDto;
 import by.bsuir.kostyademens.currencyexchange.dto.ExchangeDto;

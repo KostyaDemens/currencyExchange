@@ -1,7 +1,7 @@
 package by.bsuir.kostyademens.currencyexchange.controller;
 
 import by.bsuir.kostyademens.currencyexchange.dto.ErrorDto;
-import by.bsuir.kostyademens.currencyexchange.mappers.ModelMapper;
+import by.bsuir.kostyademens.currencyexchange.mapper.ModelMapper;
 import by.bsuir.kostyademens.currencyexchange.service.CurrencyService;
 import by.bsuir.kostyademens.currencyexchange.service.ExchangeRateService;
 import by.bsuir.kostyademens.currencyexchange.service.CurrencyExchangeService;
@@ -25,8 +25,6 @@ public class JSONServlet extends HttpServlet {
     protected void sendResponse(HttpServletResponse resp, Object object) throws IOException {
         String json = new Gson().toJson(object);
         PrintWriter pw = resp.getWriter();
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
         pw.print(json);
         pw.flush();
     }
@@ -34,8 +32,6 @@ public class JSONServlet extends HttpServlet {
     protected void sendError(HttpServletResponse resp, int errorCode, String message) throws IOException {
         String json = new Gson().toJson(new ErrorDto(message));
         PrintWriter pw = resp.getWriter();
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
         resp.setStatus(errorCode);
         pw.print(json);
         pw.flush();
