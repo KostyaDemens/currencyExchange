@@ -1,7 +1,7 @@
 package by.bsuir.kostyademens.currencyexchange.controller;
 
+import by.bsuir.kostyademens.currencyexchange.dto.ExchangeDto;
 import by.bsuir.kostyademens.currencyexchange.exception.CurrencyNotFoundException;
-import by.bsuir.kostyademens.currencyexchange.model.Exchange;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,11 +27,11 @@ public class CurrencyExchangeServlet extends JSONServlet {
                 return;
             }
 
-            Exchange exchange = currencyExchangeService.chooseCurrencyConversionRate(baseCurrencyCode, targetCurrencyCode, BigDecimal.valueOf(Long.parseLong(amount)));
-            if (exchange.getRate() == null) {
+            ExchangeDto exchangeDto = currencyExchangeService.chooseCurrencyConversionRate(baseCurrencyCode, targetCurrencyCode, BigDecimal.valueOf(Long.parseLong(amount)));
+            if (exchangeDto.getRate() == null) {
                 sendError(resp, 404, "Валютной пары с таким кодом нету в базе данных");
             } else {
-                sendResponse(resp, exchange);
+                sendResponse(resp, currencyMapper.getExchangeDTO(exchangeDto.getBaseCurrency(), exchangeDto.getTargetCurrency(), exchangeDto.getRate(), exchangeDto.getAmount(), exchangeDto.getConvertedAmount()));
             }
 
         } catch (CurrencyNotFoundException e) {

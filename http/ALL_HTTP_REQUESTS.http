@@ -2,25 +2,25 @@
 GET http://localhost:8080/currencies
 
 ### get currency by code
-GET http://localhost:8080/currency/BAM
+GET http://localhost:8080/currency/BYN
 
 ### add new currency
-POST http://localhost:8080/currencies?code=BYN&name=Belarussian ruble&sign=Br
+POST http://localhost:8080/currencies?code=MNT&name=Tugrik&sign=₮
 
-### get list of exchange rates
+### get list of exchangeDto rates
 GET http://localhost:8080/exchangeRates
 
-### get exchange rate by code
-GET http://localhost:8080/exchangeRate/BYNBAM
+### get exchangeDto rate by code
+GET http://localhost:8080/exchangeRate/MNTBYN
 
-### add new exchange rate
-POST http://localhost:8080/exchangeRates?base_code=BYN&target_code=BAM&rate=2.36
+### add new exchangeDto rate
+POST http://localhost:8080/exchangeRates?base_code=MNT&target_code=BYN&rate=2.36
 
-### change exchange rate
-PATCH http://localhost:8080/exchangeRate/BYNBAM?rate=2.2
+### change exchangeDto rate
+PATCH http://localhost:8080/exchangeRate/MNTBYN?rate=2.2
 
-### currency exchange
-GET http://localhost:8080/exchange?from=BAM&to=BYN&amount=10
+### currency exchangeDto
+GET http://localhost:8080/exchangeDto?from=BAM&to=BYN&amount=10
 
 
 ///   ERRORS AND CRITICAL SITUATIONS   ///
@@ -52,10 +52,10 @@ POST http://localhost:8080/currencies?code=BYN&name=Belarussian Ruble&sign=Br
 ### pair of currencies are missing from the address (expected: 400)
 GET http://localhost:8080/exchangeRate/
 
-### exchange rate is not found (expected: 404)
+### exchangeDto rate is not found (expected: 404)
 GET http://localhost:8080/exchangeRate/KZTAUD
 
-### exchange rate is not found bc currency is not exists (expected: 500)
+### exchangeDto rate is not found bc currency is not exists (expected: 500)
 GET http://localhost:8080/exchangeRate/WWWWWW
 
 
@@ -65,7 +65,7 @@ GET http://localhost:8080/exchangeRate/WWWWWW
 ### a required form field is missing (expected: 400)
 POST http://localhost:8080/exchangeRates?baseCurrencyCode=BZD&targetCurrencyCode=EUR
 
-### exchange rate already exists (expected: 409)
+### exchangeDto rate already exists (expected: 409)
 POST http://localhost:8080/exchangeRates?baseCurrencyCode=AUD&targetCurrencyCode=EUR&rate=4
 
 ### one or two currencies from the address are not exists (expected: 404)
@@ -78,5 +78,5 @@ POST http://localhost:8080/exchangeRates?baseCurrencyCode=WWW&targetCurrencyCode
 ### a required form field is missing (expected: 400)
 PATCH http://localhost:8080/exchangeRate/AUDBZD
 
-### exchange rate is not found (expected: 404)
+### exchangeDto rate is not found (expected: 404)
 PATCH http://localhost:8080/exchangeRate/BZDAUD?rate=4

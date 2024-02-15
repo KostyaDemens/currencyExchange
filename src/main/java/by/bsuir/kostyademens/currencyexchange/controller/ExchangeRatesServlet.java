@@ -1,5 +1,6 @@
 package by.bsuir.kostyademens.currencyexchange.controller;
 
+import by.bsuir.kostyademens.currencyexchange.dto.ExchangeRateDto;
 import by.bsuir.kostyademens.currencyexchange.exception.CurrencyNotFoundException;
 import by.bsuir.kostyademens.currencyexchange.exception.DuplicateExchangeRateException;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @WebServlet("/exchangeRates")
@@ -19,7 +21,10 @@ public class ExchangeRatesServlet extends JSONServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<ExchangeRate> exchangeRates = exchangeRateService.getAllExchangeRates();
-        sendResponse(resp, exchangeRates);
+        List<ExchangeRateDto> exchangeRateDto = exchangeRates.stream()
+                .map(currencyMapper::getExchangeRateDTO)
+                .collect(Collectors.toList());
+        sendResponse(resp, exchangeRateDto);
     }
 
     @Override
@@ -35,7 +40,7 @@ public class ExchangeRatesServlet extends JSONServlet {
                 return;
             }
             ExchangeRate exchangeRate = exchangeRateService.addExchangeRate(baseCurrencyCode, targetCurrencyCode, new BigDecimal(rate));
-            sendResponse(resp, exchangeRate);
+            sendResponse(resp, currencyMapper.getExchangeRateDTO(exchangeRate));
         } catch (DuplicateExchangeRateException e) {
             sendError(resp, 409, "Такая валютная пара уже существует");
             e.printStackTrace();

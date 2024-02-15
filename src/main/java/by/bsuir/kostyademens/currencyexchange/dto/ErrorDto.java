@@ -1,9 +1,9 @@
-package by.bsuir.kostyademens.currencyexchange.model;
+package by.bsuir.kostyademens.currencyexchange.dto;
 
-public class Error {
+public class ErrorDto {
     private String message;
 
-    public Error(String message) {
+    public ErrorDto(String message) {
         this.message = message;
     }
 

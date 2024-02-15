@@ -21,7 +21,7 @@ public class CurrencyByCodeServlet extends JSONServlet {
                 return;
             }
             Currency currency = currencyService.getCurrencyByCode(path);
-            sendResponse(resp, currency);
+            sendResponse(resp, currencyMapper.getCurrencyDTO(currency));
         } catch (CurrencyNotFoundException e) {
             sendError(resp, 404, "Валюта не найдена");
             e.printStackTrace();

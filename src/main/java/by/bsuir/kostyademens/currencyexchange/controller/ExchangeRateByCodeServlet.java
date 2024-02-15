@@ -25,7 +25,7 @@ public class ExchangeRateByCodeServlet extends JSONServlet {
                 return;
             }
             ExchangeRate exchangeRate = exchangeRateService.getExchangeRateByCode(path);
-            sendResponse(resp, exchangeRate);
+            sendResponse(resp, currencyMapper.getExchangeRateDTO(exchangeRate));
         } catch (CurrencyNotFoundException e) {
             sendError(resp, 404, "Валюты с таким кодом нету в базе данных");
             e.printStackTrace();
@@ -48,7 +48,7 @@ public class ExchangeRateByCodeServlet extends JSONServlet {
                 return;
             }
             ExchangeRate exchangeRate = exchangeRateService.changeExchangeRate(path, new BigDecimal(rate));
-            sendResponse(resp, exchangeRate);
+            sendResponse(resp, currencyMapper.getExchangeRateDTO(exchangeRate));
         } catch (ExchangeRateNotFoundException e) {
             sendError(resp, 404, "Валютной пары с таким кодом нету в базе данных");
             e.printStackTrace();
