@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>by.bsuir.kostyademens</groupId>
-    <artifactId>exchangeDto</artifactId>
+    <artifactId>currencyExchange</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>exchangeDto</name>
     <packaging>war</packaging>
@@ -14,7 +14,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
-        <junit.version>5.9.2</junit.version>
     </properties>
 
     <dependencies>

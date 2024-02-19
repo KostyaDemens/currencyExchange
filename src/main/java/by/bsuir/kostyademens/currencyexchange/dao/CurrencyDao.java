@@ -2,7 +2,6 @@ package by.bsuir.kostyademens.currencyexchange.dao;
 
 import by.bsuir.kostyademens.currencyexchange.exception.CurrencyNotFoundException;
 import by.bsuir.kostyademens.currencyexchange.exception.DuplicateCurrencyException;
-import by.bsuir.kostyademens.currencyexchange.exception.NoRowsAffectedException;
 import by.bsuir.kostyademens.currencyexchange.model.Currency;
 
 import java.sql.*;
@@ -16,9 +15,10 @@ public class CurrencyDao {
 
     public List<Currency> getAllCurrencies() {
         String SQL = "SELECT * FROM currencies";
-        List<Currency> currencies = new ArrayList<>();
+
         try (Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(SQL);
+            List<Currency> currencies = new ArrayList<>();
             while (resultSet.next()) {
                 Currency currency = new Currency();
 
@@ -29,15 +29,16 @@ public class CurrencyDao {
 
                 currencies.add(currency);
             }
+            return currencies;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return currencies;
     }
 
     public Currency getCurrencyByCode(String code) {
-        Currency currency = new Currency();
         String SQL = "SELECT * FROM currencies WHERE code = ?";
+
+        Currency currency = new Currency();
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setString(1, code);
             ResultSet resultSet = statement.executeQuery();
@@ -56,27 +57,25 @@ public class CurrencyDao {
     }
 
     public Currency addCurrency(String code, String fullName, String sign) {
-        Currency currency = new Currency();
         String SQL = "INSERT INTO currencies (code, fullName, sign) VALUES (?,?,?)";
+
         try (PreparedStatement statement = connection.prepareStatement(SQL, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setString(1, code);
             statement.setString(2, fullName);
             statement.setString(3, sign);
-            int affectedRows = statement.executeUpdate();
 
-            if (affectedRows == 0) {
-                throw new NoRowsAffectedException("No rows where affected by the update operation.");
-            }
+            statement.executeUpdate();
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
+                    Currency currency = new Currency();
                     long id = generatedKeys.getLong(1);
                     currency.setCode(code);
                     currency.setName(fullName);
                     currency.setSign(sign);
                     currency.setId(id);
-
+                    return currency;
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -84,29 +83,16 @@ public class CurrencyDao {
         } catch (SQLException e) {
             if (e.getErrorCode() == 19) {
                 throw new DuplicateCurrencyException("Currency with such code already exists");
+            } else {
+                throw new RuntimeException(e);
             }
         }
-        return currency;
-    }
-
-    public boolean isCodeExists(String code) {
-        String SQL = "SELECT COUNT(*) FROM currencies WHERE code = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(SQL)) {
-            preparedStatement.setString(1, code);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                int count = resultSet.getInt(1);
-                return count > 0;
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return false;
+        return null;
     }
 
     public Currency getCurrencyById(long id) {
-        Currency currency = new Currency();
         String SQL = "SELECT * FROM currencies WHERE id = ?";
+        Currency currency = new Currency();
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setLong(1, id);
             ResultSet resultSet = statement.executeQuery();

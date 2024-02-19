@@ -23,8 +23,11 @@ public class ExchangeRateByCodeServlet extends JSONServlet {
             if (path.isEmpty()) {
                 sendError(resp, 400, "Валютная пара отстутсвтует в адресе");
                 return;
+            } else if (!path.matches("^[A-Z]{6}$")) {
+                sendError(resp, 412, "Некорректное значение поля - " + path);
+                return;
             }
-            ExchangeRate exchangeRate = exchangeRateService.getExchangeRateByCode(path);
+            ExchangeRate exchangeRate = exchangeRateService.getExchangeRateByCode(path.substring(0, 3), path.substring(3, 6));
             sendResponse(resp, currencyMapper.getExchangeRateDTO(exchangeRate));
         } catch (CurrencyNotFoundException e) {
             sendError(resp, 404, "Валюты с таким кодом нету в базе данных");
@@ -43,11 +46,17 @@ public class ExchangeRateByCodeServlet extends JSONServlet {
 
 
         try {
-            if (rate == null) {
-                sendError(resp, 400, "Отсутствует нужное поле формы");
+            if (path.isEmpty()) {
+                sendError(resp, 400, "Валютная пара отсутствует в адресе");
+                return;
+            } else if (rate == null) {
+                sendError(resp, 400, "Отстутствует нужное поле формы");
+                return;
+            } else if (!rate.matches("\\d+(\\.\\d+)?")) {
+                sendError(resp, 412, "Некорректное значение поля - " + rate);
                 return;
             }
-            ExchangeRate exchangeRate = exchangeRateService.changeExchangeRate(path, new BigDecimal(rate));
+            ExchangeRate exchangeRate = exchangeRateService.changeExchangeRate(path.substring(0, 3), path.substring(3, 6), new BigDecimal(rate));
             sendResponse(resp, currencyMapper.getExchangeRateDTO(exchangeRate));
         } catch (ExchangeRateNotFoundException e) {
             sendError(resp, 404, "Валютной пары с таким кодом нету в базе данных");

@@ -38,9 +38,12 @@ public class ExchangeRatesServlet extends JSONServlet {
             if (baseCurrencyCode == null || targetCurrencyCode == null || rate == null) {
                 sendError(resp, 400, "Отсутствует нужное поле формы");
                 return;
+            } else if (!rate.matches("\\d+(\\.\\d+)?")) {
+                sendError(resp, 412, "Некорректное значение поля - " + rate);
+                return;
             }
             ExchangeRate exchangeRate = exchangeRateService.addExchangeRate(baseCurrencyCode, targetCurrencyCode, new BigDecimal(rate));
-            sendResponse(resp, currencyMapper.getExchangeRateDTO(exchangeRate));
+            sendResponse(resp, 201, currencyMapper.getExchangeRateDTO(exchangeRate));
         } catch (DuplicateExchangeRateException e) {
             sendError(resp, 409, "Такая валютная пара уже существует");
             e.printStackTrace();

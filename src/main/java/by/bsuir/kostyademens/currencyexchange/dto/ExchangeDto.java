@@ -1,30 +1,28 @@
 package by.bsuir.kostyademens.currencyexchange.dto;
 
-import by.bsuir.kostyademens.currencyexchange.model.Currency;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 public class ExchangeDto {
-    private Currency baseCurrency;
-    private Currency targetCurrency;
+    private CurrencyDto baseCurrency;
+    private CurrencyDto targetCurrency;
     private BigDecimal rate;
     private BigDecimal amount;
     private BigDecimal convertedAmount;
 
-    public Currency getBaseCurrency() {
+    public CurrencyDto getBaseCurrency() {
         return baseCurrency;
     }
 
-    public void setBaseCurrency(Currency baseCurrency) {
+    public void setBaseCurrency(CurrencyDto baseCurrency) {
         this.baseCurrency = baseCurrency;
     }
 
-    public Currency getTargetCurrency() {
+    public CurrencyDto getTargetCurrency() {
         return targetCurrency;
     }
 
-    public void setTargetCurrency(Currency targetCurrency) {
+    public void setTargetCurrency(CurrencyDto targetCurrency) {
         this.targetCurrency = targetCurrency;
     }
 
@@ -52,14 +50,5 @@ public class ExchangeDto {
         this.convertedAmount = convertedAmount.setScale(2, RoundingMode.HALF_UP);
     }
 
-    public ExchangeDto(Currency baseCurrency, Currency targetCurrency, BigDecimal rate, BigDecimal amount, BigDecimal convertedAmount) {
-        this.baseCurrency = baseCurrency;
-        this.targetCurrency = targetCurrency;
-        this.rate = rate;
-        this.amount = amount;
-        this.convertedAmount = convertedAmount;
-    }
 
-    public ExchangeDto() {
-    }
 }

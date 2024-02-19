@@ -22,16 +22,16 @@ public class ModelMapper {
     public ExchangeRateDto getExchangeRateDTO(ExchangeRate exchangeRate) {
         ExchangeRateDto exchangeRateDto = new ExchangeRateDto();
         exchangeRateDto.setId(exchangeRate.getId());
-        exchangeRateDto.setBaseCurrency(exchangeRate.getBaseCurrency());
-        exchangeRateDto.setTargetCurrency(exchangeRate.getTargetCurrency());
+        exchangeRateDto.setBaseCurrency(getCurrencyDTO(exchangeRate.getBaseCurrency()));
+        exchangeRateDto.setTargetCurrency(getCurrencyDTO(exchangeRate.getTargetCurrency()));
         exchangeRateDto.setRate(exchangeRate.getRate());
         return exchangeRateDto;
     }
 
     public ExchangeDto getExchangeDTO(Currency baseCurrency, Currency targetCurrency, BigDecimal rate, BigDecimal amount, BigDecimal convertedAmount) {
         ExchangeDto exchangeDto = new ExchangeDto();
-        exchangeDto.setBaseCurrency(baseCurrency);
-        exchangeDto.setTargetCurrency(targetCurrency);
+        exchangeDto.setBaseCurrency(getCurrencyDTO(baseCurrency));
+        exchangeDto.setTargetCurrency(getCurrencyDTO(targetCurrency));
         exchangeDto.setRate(rate.setScale(6, RoundingMode.HALF_EVEN));
         exchangeDto.setAmount(amount.setScale(6, RoundingMode.HALF_EVEN));
         exchangeDto.setConvertedAmount(convertedAmount.setScale(6, RoundingMode.HALF_EVEN));

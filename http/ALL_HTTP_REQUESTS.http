@@ -2,7 +2,7 @@
 GET http://localhost:8080/currencies
 
 ### get currency by code
-GET http://localhost:8080/currency/BYN
+GET http://localhost:8080/currency/MNT
 
 ### add new currency
 POST http://localhost:8080/currencies?code=MNT&name=Tugrik&sign=₮

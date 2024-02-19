@@ -38,6 +38,4 @@ public class CurrencyDto {
         this.name = name;
     }
 
-    public CurrencyDto() {
-    }
 }

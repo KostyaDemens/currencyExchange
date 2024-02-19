@@ -36,9 +36,12 @@ public class CurrenciesServlet extends JSONServlet {
             if (code == null || name == null || sign == null) {
                 sendError(resp, 400, "Отсутствует нужное поле формы");
                 return;
+            } else if (!code.matches("^[A-Z]{3}$")) {
+                sendError(resp, 412, "Некорректное значение поля - " + code);
+                return;
             }
             Currency currency = currencyService.addCurrency(code, name, sign);
-            sendResponse(resp, currencyMapper.getCurrencyDTO(currency));
+            sendResponse(resp, 201, currencyMapper.getCurrencyDTO(currency));
         } catch (DuplicateCurrencyException e) {
             sendError(resp, 409, "Валюта с таким кодом уже существует");
             e.printStackTrace();

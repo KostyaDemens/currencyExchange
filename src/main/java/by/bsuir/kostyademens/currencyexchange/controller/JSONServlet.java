@@ -21,18 +21,25 @@ public class JSONServlet extends HttpServlet {
     protected CurrencyService currencyService = new CurrencyService();
     protected ExchangeRateService exchangeRateService = new ExchangeRateService();
     protected CurrencyExchangeService currencyExchangeService = new CurrencyExchangeService();
+    private static final int DEFAULT_SUCCESS_STATUS = 200;
 
-    protected void sendResponse(HttpServletResponse resp, Object object) throws IOException {
-        String json = new Gson().toJson(object);
-        PrintWriter pw = resp.getWriter();
-        pw.print(json);
-        pw.flush();
+
+    protected void sendResponse(HttpServletResponse resp, Object obj) throws IOException {
+        sendResponse(resp, DEFAULT_SUCCESS_STATUS, obj);
+    }
+
+    protected void sendResponse(HttpServletResponse resp, int statusCode, Object object) throws IOException {
+        send(resp, statusCode, object);
     }
 
     protected void sendError(HttpServletResponse resp, int errorCode, String message) throws IOException {
-        String json = new Gson().toJson(new ErrorDto(message));
+        send(resp, errorCode, new ErrorDto(message));
+    }
+
+    private void send(HttpServletResponse resp, int statusCode, Object obj) throws IOException {
+        String json = new Gson().toJson(obj);
         PrintWriter pw = resp.getWriter();
-        resp.setStatus(errorCode);
+        resp.setStatus(statusCode);
         pw.print(json);
         pw.flush();
     }
@@ -40,20 +47,10 @@ public class JSONServlet extends HttpServlet {
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String method = req.getMethod();
-        switch (method) {
-            case "POST":
-                resp.setStatus(201);
-                this.doPost(req, resp);
-                break;
-            case "GET":
-                this.doGet(req, resp);
-                break;
-            case "PATCH":
-                this.doPatch(req, resp);
-                break;
-            default:
-                super.service(req, resp);
-                break;
+        if (method.equals("PATCH")) {
+            this.doPatch(req, resp);
+        } else {
+            super.service(req, resp);
         }
     }
 

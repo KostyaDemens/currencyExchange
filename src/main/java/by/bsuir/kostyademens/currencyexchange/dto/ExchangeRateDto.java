@@ -1,13 +1,12 @@
 package by.bsuir.kostyademens.currencyexchange.dto;
 
-import by.bsuir.kostyademens.currencyexchange.model.Currency;
 
 import java.math.BigDecimal;
 
 public class ExchangeRateDto {
     private Long id;
-    private Currency baseCurrency;
-    private Currency targetCurrency;
+    private CurrencyDto baseCurrency;
+    private CurrencyDto targetCurrency;
     private BigDecimal rate;
 
     public Long getId() {
@@ -18,19 +17,19 @@ public class ExchangeRateDto {
         this.id = id;
     }
 
-    public Currency getBaseCurrency() {
+    public CurrencyDto getBaseCurrency() {
         return baseCurrency;
     }
 
-    public void setBaseCurrency(Currency baseCurrency) {
+    public void setBaseCurrency(CurrencyDto baseCurrency) {
         this.baseCurrency = baseCurrency;
     }
 
-    public Currency getTargetCurrency() {
+    public CurrencyDto getTargetCurrency() {
         return targetCurrency;
     }
 
-    public void setTargetCurrency(Currency targetCurrency) {
+    public void setTargetCurrency(CurrencyDto targetCurrency) {
         this.targetCurrency = targetCurrency;
     }
 

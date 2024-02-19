@@ -18,12 +18,12 @@ public class ExchangeRateService extends ExchangeRateDao {
         return exchangeRateDao.addExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
     }
 
-    public ExchangeRate getExchangeRateByCode(String path) {
-        return exchangeRateDao.getExchangeRateByCode(path);
+    public ExchangeRate getExchangeRateByCode(String baseCurrencyCode, String targetCurrencyCode) {
+        return exchangeRateDao.getExchangeRateByCode(baseCurrencyCode, targetCurrencyCode);
     }
 
-    public ExchangeRate changeExchangeRate(String path, BigDecimal rate) {
-        return exchangeRateDao.changeExchangeRate(path, rate);
+    public ExchangeRate changeExchangeRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
+        return exchangeRateDao.changeExchangeRate(baseCurrencyCode, targetCurrencyCode, rate);
     }
 
 }
