@@ -16,6 +16,9 @@ import static by.bsuir.kostyademens.currencyexchange.dao.JDBCConnector.connectio
 
 public class ExchangeRateDao {
 
+    private static ExchangeRate exchangeRate = new ExchangeRate();
+    private static final CurrencyDao currencyDao = new CurrencyDao();
+
     public List<ExchangeRate> getAllExchangeRates() {
         String SQL = "SELECT exch.id, cur.id AS base_id, cur.code, cur.fullname, cur.sign, cur2.id AS target_id, cur2.code AS target_code, cur2.fullname AS target_fullname, cur2.sign AS target_sign, exch.rate " +
                 "FROM exchangerates exch " +
@@ -26,7 +29,7 @@ public class ExchangeRateDao {
             List<ExchangeRate> exchangeRateList = new ArrayList<>();
             ResultSet resultSet = statement.executeQuery(SQL);
             while (resultSet.next()) {
-                ExchangeRate exchangeRate = new ExchangeRate();
+                exchangeRate = new ExchangeRate();
                 Currency baseCurrency = new Currency();
                 Currency targetCurrency = new Currency();
 
@@ -47,7 +50,6 @@ public class ExchangeRateDao {
                 targetCurrency.setSign(resultSet.getString("target_sign"));
                 targetCurrency.setName(resultSet.getString("target_fullname"));
 
-
                 exchangeRateList.add(exchangeRate);
             }
             return exchangeRateList;
@@ -59,10 +61,6 @@ public class ExchangeRateDao {
 
     public ExchangeRate getExchangeRateByCode(String baseCurrencyCode, String targetCurrencyCode) {
         String SQL = "SELECT * FROM exchangerates WHERE basecurrencyid = ? AND targetcurrencyid = ?";
-
-        ExchangeRate exchangeRate = new ExchangeRate();
-
-        CurrencyDao currencyDao = new CurrencyDao();
 
         Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
         Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
@@ -89,9 +87,6 @@ public class ExchangeRateDao {
 
     public ExchangeRate addExchangeRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
         String SQL = "INSERT INTO exchangerates (basecurrencyid, targetcurrencyid, rate) VALUES (?,?,?)";
-
-        ExchangeRate exchangeRate = new ExchangeRate();
-        CurrencyDao currencyDao = new CurrencyDao();
 
         Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
         Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
@@ -142,7 +137,7 @@ public class ExchangeRateDao {
     }
 
 
-    public ExchangeRate changeExchangeRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) throws CurrencyNotFoundException {
+    public ExchangeRate changeExchangeRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal rate) {
         String SQL = "UPDATE exchangeRates SET rate = ? WHERE id = ?";
 
         ExchangeRate exchangeRate = getExchangeRateByCode(baseCurrencyCode, targetCurrencyCode);
@@ -166,16 +161,15 @@ public class ExchangeRateDao {
     public List<ExchangeRate> getExchangeRatesByCurrency(String path) {
         String SQL = "SELECT * FROM exchangerates WHERE targetcurrencyid = ?";
 
-        CurrencyDao currencyDao = new CurrencyDao();
-
         Currency targetCurrency = currencyDao.getCurrencyByCode(path);
 
         List<ExchangeRate> exchangeRates = new ArrayList<>();
         try (PreparedStatement statement = connection.prepareStatement(SQL)) {
             statement.setLong(1, targetCurrency.getId());
             ResultSet resultSet = statement.executeQuery();
+
             while (resultSet.next()) {
-                ExchangeRate exchangeRate = new ExchangeRate();
+                exchangeRate = new ExchangeRate();
                 exchangeRate.setId(resultSet.getLong("id"));
                 exchangeRate.setTargetCurrency(targetCurrency);
                 exchangeRate.setRate(resultSet.getBigDecimal("rate"));
@@ -183,6 +177,9 @@ public class ExchangeRateDao {
                 exchangeRates.add(exchangeRate);
             }
 
+            if (exchangeRates.isEmpty()) {
+                throw new ExchangeRateNotFoundException("Exchange rate is not exists");
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

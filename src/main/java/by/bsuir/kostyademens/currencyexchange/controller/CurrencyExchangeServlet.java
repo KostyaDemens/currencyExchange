@@ -26,12 +26,12 @@ public class CurrencyExchangeServlet extends JSONServlet {
             if (baseCurrencyCode == null || targetCurrencyCode == null || amount == null) {
                 sendError(resp, 400, "Отсутствует нужное поле формы");
                 return;
-            } else if (!amount.matches("\\d+")) {
+            } else if (!amount.matches("\\d+(\\.\\d+)?")) {
                 sendError(resp, 412, "Некорректное значение поля - " + amount);
                 return;
             }
 
-            ExchangeDto exchangeDto = currencyExchangeService.chooseCurrencyConversionRate(baseCurrencyCode, targetCurrencyCode, BigDecimal.valueOf(Long.parseLong(amount)));
+            ExchangeDto exchangeDto = currencyExchangeService.convertCurrency(baseCurrencyCode, targetCurrencyCode, new BigDecimal(amount));
             sendResponse(resp, exchangeDto);
 
         } catch (CurrencyNotFoundException e) {

@@ -13,14 +13,14 @@ import java.io.IOException;
 public class CurrencyByCodeServlet extends JSONServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String path = req.getPathInfo().substring(1);
+        String code = req.getPathInfo().substring(1);
 
         try {
-            if (path.isEmpty()) {
+            if (code.isEmpty()) {
                 sendError(resp, 400, "Код валюты отсутствует в адресе");
                 return;
             }
-            Currency currency = currencyService.getCurrencyByCode(path);
+            Currency currency = currencyService.getCurrencyByCode(code);
             sendResponse(resp, currencyMapper.getCurrencyDTO(currency));
         } catch (CurrencyNotFoundException e) {
             sendError(resp, 404, "Валюта не найдена");

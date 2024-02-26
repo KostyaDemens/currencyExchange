@@ -41,6 +41,9 @@ public class ExchangeRatesServlet extends JSONServlet {
             } else if (!rate.matches("\\d+(\\.\\d+)?")) {
                 sendError(resp, 412, "Некорректное значение поля - " + rate);
                 return;
+            } else if (baseCurrencyCode.equals(targetCurrencyCode)) {
+                sendError(resp, 412, "Две одинаковые валюты - " + baseCurrencyCode + "!");
+                return;
             }
             ExchangeRate exchangeRate = exchangeRateService.addExchangeRate(baseCurrencyCode, targetCurrencyCode, new BigDecimal(rate));
             sendResponse(resp, 201, currencyMapper.getExchangeRateDTO(exchangeRate));

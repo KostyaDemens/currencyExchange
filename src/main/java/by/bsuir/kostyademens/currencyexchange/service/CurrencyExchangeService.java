@@ -17,20 +17,24 @@ public class CurrencyExchangeService {
     private final ExchangeRateDao exchangeRateDao = new ExchangeRateDao();
     private ExchangeRate exchangeRate = new ExchangeRate();
 
-    private ExchangeDto directExchangeRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
-        ExchangeDto exchangeDto = mapValuesToCurrency(baseCurrencyCode, targetCurrencyCode, amount, baseCurrencyCode + targetCurrencyCode);
+    private ExchangeDto calculateDirectExchangeRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
+        ExchangeDto exchangeDto = mapValuesToCurrency(baseCurrencyCode, targetCurrencyCode, amount);
+        exchangeDto.setBaseCurrency(mapper.getCurrencyDTO(currencyDao.getCurrencyByCode(baseCurrencyCode)));
+        exchangeDto.setTargetCurrency(mapper.getCurrencyDTO(currencyDao.getCurrencyByCode(targetCurrencyCode)));
         exchangeDto.setConvertedAmount(exchangeRate.getRate().multiply(amount));
         return exchangeDto;
     }
 
 
-    private ExchangeDto inverseExchangeRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
-        ExchangeDto exchangeDto = mapValuesToCurrency(baseCurrencyCode, targetCurrencyCode, amount, targetCurrencyCode + baseCurrencyCode);
+    private ExchangeDto calculateInverseExchangeRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
+        ExchangeDto exchangeDto = mapValuesToCurrency(baseCurrencyCode, targetCurrencyCode, amount);
+        exchangeDto.setBaseCurrency(mapper.getCurrencyDTO(currencyDao.getCurrencyByCode(targetCurrencyCode)));
+        exchangeDto.setTargetCurrency(mapper.getCurrencyDTO(currencyDao.getCurrencyByCode(baseCurrencyCode)));
         exchangeDto.setConvertedAmount(exchangeRate.getRate().divide(amount, 7, RoundingMode.DOWN));
         return exchangeDto;
     }
 
-    private ExchangeDto crossExchangeRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
+    private ExchangeDto calculateCrossExchangeRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
         ExchangeDto exchangeDto = new ExchangeDto();
 
         List<ExchangeRate> baseCurrencyList = exchangeRateDao.getExchangeRatesByCurrency(baseCurrencyCode);
@@ -52,26 +56,22 @@ public class CurrencyExchangeService {
         return exchangeDto;
     }
 
-    public ExchangeDto chooseCurrencyConversionRate(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
+    public ExchangeDto convertCurrency(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
         Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
         Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
         if (exchangeRateDao.isExchangeRateExists(baseCurrency.getId(), targetCurrency.getId())) {
-            return directExchangeRate(baseCurrencyCode, targetCurrencyCode, amount);
+            return calculateDirectExchangeRate(baseCurrencyCode, targetCurrencyCode, amount);
         } else if (exchangeRateDao.isExchangeRateExists(targetCurrency.getId(), baseCurrency.getId())) {
-            return inverseExchangeRate(targetCurrencyCode, baseCurrencyCode, amount);
+            return calculateInverseExchangeRate(targetCurrencyCode, baseCurrencyCode, amount);
         } else {
-            return crossExchangeRate(baseCurrencyCode, targetCurrencyCode, amount);
+            return calculateCrossExchangeRate(baseCurrencyCode, targetCurrencyCode, amount);
         }
 
     }
 
-    private ExchangeDto mapValuesToCurrency(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount, String path) {
+    private ExchangeDto mapValuesToCurrency(String baseCurrencyCode, String targetCurrencyCode, BigDecimal amount) {
         ExchangeDto exchangeDto = new ExchangeDto();
-        Currency baseCurrency = currencyDao.getCurrencyByCode(baseCurrencyCode);
-        Currency targetCurrency = currencyDao.getCurrencyByCode(targetCurrencyCode);
         exchangeRate = exchangeRateDao.getExchangeRateByCode(baseCurrencyCode, targetCurrencyCode);
-        exchangeDto.setBaseCurrency(mapper.getCurrencyDTO(baseCurrency));
-        exchangeDto.setTargetCurrency(mapper.getCurrencyDTO(targetCurrency));
         exchangeDto.setRate(exchangeRate.getRate());
         exchangeDto.setAmount(amount);
         return exchangeDto;

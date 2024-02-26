@@ -1,13 +1,10 @@
 package by.bsuir.kostyademens.currencyexchange.mapper;
 
 import by.bsuir.kostyademens.currencyexchange.dto.CurrencyDto;
-import by.bsuir.kostyademens.currencyexchange.dto.ExchangeDto;
 import by.bsuir.kostyademens.currencyexchange.dto.ExchangeRateDto;
 import by.bsuir.kostyademens.currencyexchange.model.Currency;
 import by.bsuir.kostyademens.currencyexchange.model.ExchangeRate;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 public class ModelMapper {
     public CurrencyDto getCurrencyDTO(Currency currency) {
@@ -28,13 +25,4 @@ public class ModelMapper {
         return exchangeRateDto;
     }
 
-    public ExchangeDto getExchangeDTO(Currency baseCurrency, Currency targetCurrency, BigDecimal rate, BigDecimal amount, BigDecimal convertedAmount) {
-        ExchangeDto exchangeDto = new ExchangeDto();
-        exchangeDto.setBaseCurrency(getCurrencyDTO(baseCurrency));
-        exchangeDto.setTargetCurrency(getCurrencyDTO(targetCurrency));
-        exchangeDto.setRate(rate.setScale(6, RoundingMode.HALF_EVEN));
-        exchangeDto.setAmount(amount.setScale(6, RoundingMode.HALF_EVEN));
-        exchangeDto.setConvertedAmount(convertedAmount.setScale(6, RoundingMode.HALF_EVEN));
-        return exchangeDto;
-    }
 }
