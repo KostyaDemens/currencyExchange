@@ -170,8 +170,3 @@ To obtain the exchange rate, there are three possible scenarios when performing 
 2. If the ExchangeRates table contains the currency pair **BA**, we take its exchange rate and calculate the reciprocal to obtain **AB**.
 3. If the ExchangeRates table contains the currency pairs **USD-A** and **USD-B**, we compute the exchange rate **AB** based on these rates.
 
-## Installation and Running
-To run `currency-exchange-api`, follow these steps:
-1. Clone the repository.
-2. Build the JAR artifact using the command `mvn package`.
-3. Launch the application using the command `java -jar [artifact_name].jar`.
